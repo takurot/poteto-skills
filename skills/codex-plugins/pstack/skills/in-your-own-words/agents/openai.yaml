@@ -1,0 +1,5 @@
+interface:
+  display_name: "In Your Own Words"
+  short_description: "Restate in your own words what you think the user's goals..."
+policy:
+  allow_implicit_invocation: false

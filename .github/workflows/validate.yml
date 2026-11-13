@@ -52,6 +52,9 @@ jobs:
             fi
             sleep $((attempt * 20))
           done
-          python scripts/build_skills.py --source upstream-plugins --output regenerated-skills
-          python scripts/validate_generated.py regenerated-skills
+          python scripts/build_skills.py --source upstream-plugins --output regenerated-skills \
+            --marketplace regenerated-marketplace.json
+          python scripts/validate_generated.py regenerated-skills \
+            --marketplace regenerated-marketplace.json
           diff -qr skills regenerated-skills
+          diff -q .agents/plugins/marketplace.json regenerated-marketplace.json

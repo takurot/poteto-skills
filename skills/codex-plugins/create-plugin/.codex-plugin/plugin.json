@@ -1,0 +1,29 @@
+{
+  "name": "create-plugin",
+  "version": "1.0.0+poteto.8dc6f86",
+  "description": "Scaffold and validate new agent plugins. Handles directory setup, manifest generation, and pre-submission quality checks for the marketplace.",
+  "author": {
+    "name": "Cursor"
+  },
+  "homepage": "https://github.com/cursor/plugins",
+  "repository": "https://github.com/cursor/plugins",
+  "license": "MIT",
+  "keywords": [
+    "create-plugin",
+    "cursor-plugin",
+    "marketplace",
+    "plugin-authoring",
+    "meta",
+    "authoring",
+    "templates"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Create Plugin",
+    "shortDescription": "Scaffold and validate new agent plugins.",
+    "longDescription": "Scaffold and validate new agent plugins. Handles directory setup, manifest generation, and pre-submission quality checks for the marketplace.",
+    "developerName": "Cursor",
+    "category": "Developer Tools",
+    "websiteURL": "https://github.com/cursor/plugins"
+  }
+}
