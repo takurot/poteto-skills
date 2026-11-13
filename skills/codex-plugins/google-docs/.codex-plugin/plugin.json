@@ -1,0 +1,29 @@
+{
+  "name": "google-docs",
+  "version": "1.1.0+poteto.1869f8c",
+  "description": "Read, create, and edit documents.",
+  "author": {
+    "name": "Cursor"
+  },
+  "homepage": "https://github.com/cursor/plugins/tree/main/third_party/google-docs",
+  "repository": "https://github.com/cursor/plugins",
+  "license": "MIT",
+  "keywords": [
+    "google-docs",
+    "docs",
+    "google",
+    "mcp",
+    "documents",
+    "workspace",
+    "google-workspace"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Google Docs",
+    "shortDescription": "Read, create, and edit documents.",
+    "longDescription": "Read, create, and edit documents.",
+    "developerName": "Cursor",
+    "category": "Productivity",
+    "websiteURL": "https://github.com/cursor/plugins/tree/main/third_party/google-docs"
+  }
+}

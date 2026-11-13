@@ -1,0 +1,31 @@
+{
+  "name": "orchestrate",
+  "version": "1.1.0+poteto.856382e",
+  "description": "Fan a large task out across parallel cloud agents via the Cursor SDK: planners publish tasks, workers hand off back up, and a script reconciles the tree from disk and git.",
+  "author": {
+    "name": "Cursor"
+  },
+  "homepage": "https://github.com/cursor/plugins/tree/main/orchestrate",
+  "repository": "https://github.com/cursor/plugins",
+  "license": "MIT",
+  "keywords": [
+    "orchestrate",
+    "cursor",
+    "cursor-sdk",
+    "agents",
+    "cloud-agents",
+    "parallel",
+    "automation",
+    "developer-tools",
+    "sdk"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Orchestrate",
+    "shortDescription": "Fan a large task out across parallel cloud agents via the Cursor SDK: planners publish tasks,...",
+    "longDescription": "Fan a large task out across parallel cloud agents via the Cursor SDK: planners publish tasks, workers hand off back up, and a script reconciles the tree from disk and git.",
+    "developerName": "Cursor",
+    "category": "Developer Tools",
+    "websiteURL": "https://github.com/cursor/plugins/tree/main/orchestrate"
+  }
+}

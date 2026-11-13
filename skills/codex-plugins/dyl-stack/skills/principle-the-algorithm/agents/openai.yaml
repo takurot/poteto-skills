@@ -1,0 +1,5 @@
+interface:
+  display_name: "Principle The Algorithm"
+  short_description: "Apply to any non-trivial change before designing it. Make..."
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,32 @@
+{
+  "name": "cursor-sdk",
+  "version": "1.0.0+poteto.fdc8a50",
+  "description": "Build apps, scripts, and automations with the TypeScript SDK.",
+  "author": {
+    "name": "Cursor"
+  },
+  "homepage": "https://github.com/cursor/plugins/tree/main/cursor-sdk",
+  "repository": "https://github.com/cursor/plugins",
+  "license": "MIT",
+  "keywords": [
+    "cursor-sdk",
+    "cursor",
+    "sdk",
+    "typescript",
+    "agents",
+    "automation",
+    "ci",
+    "mcp",
+    "streaming",
+    "developer-tools"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Cursor SDK",
+    "shortDescription": "Build apps, scripts, and automations with the TypeScript SDK.",
+    "longDescription": "Build apps, scripts, and automations with the TypeScript SDK.",
+    "developerName": "Cursor",
+    "category": "Developer Tools",
+    "websiteURL": "https://github.com/cursor/plugins/tree/main/cursor-sdk"
+  }
+}

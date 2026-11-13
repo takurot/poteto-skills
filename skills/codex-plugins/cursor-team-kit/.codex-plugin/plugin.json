@@ -1,0 +1,34 @@
+{
+  "name": "cursor-team-kit",
+  "version": "1.2.0+poteto.b96ce35",
+  "description": "Internal engineering team workflows for CI, code review, shipping, control-cli, control-ui, verify-this, test reliability, code cleanup, and work summaries. Designed to work without requiring third-party service integrations.",
+  "author": {
+    "name": "Eric Zakariasson"
+  },
+  "homepage": "https://github.com/cursor/plugins",
+  "repository": "https://github.com/cursor/plugins",
+  "license": "MIT",
+  "keywords": [
+    "cursor-team-kit",
+    "ci",
+    "code-review",
+    "shipping",
+    "testing",
+    "verification",
+    "local-automation",
+    "internal-workflows",
+    "quality",
+    "delivery",
+    "review",
+    "automation"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Cursor Team Kit",
+    "shortDescription": "Internal engineering team workflows for CI, code review, shipping, control-cli, control-ui,...",
+    "longDescription": "Internal engineering team workflows for CI, code review, shipping, control-cli, control-ui, verify-this, test reliability, code cleanup, and work summaries. Designed to work without requiring third-party service integrations.",
+    "developerName": "Eric Zakariasson",
+    "category": "Developer Tools",
+    "websiteURL": "https://github.com/cursor/plugins"
+  }
+}

@@ -1,0 +1,272 @@
+{
+  "name": "poteto-skills",
+  "interface": {
+    "displayName": "poteto-skills"
+  },
+  "plugins": [
+    {
+      "name": "advisor",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-plugins/advisor"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "agent-compatibility",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-plugins/agent-compatibility"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "cli-for-agent",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-plugins/cli-for-agent"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "continual-learning",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-plugins/continual-learning"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "create-plugin",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-plugins/create-plugin"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "cursor-sdk",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-plugins/cursor-sdk"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "cursor-team-kit",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-plugins/cursor-team-kit"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "dyl-stack",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-plugins/dyl-stack"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "google-docs",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-plugins/google-docs"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "google-drive",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-plugins/google-drive"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "google-sheets",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-plugins/google-sheets"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "google-slides",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-plugins/google-slides"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "grok-voice",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-plugins/grok-voice"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "orchestrate",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-plugins/orchestrate"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "origin-apps",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-plugins/origin-apps"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "pstack",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-plugins/pstack"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "ralph-loop",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-plugins/ralph-loop"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "tailscale",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-plugins/tailscale"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Integrations"
+    },
+    {
+      "name": "teaching",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-plugins/teaching"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Utilities"
+    },
+    {
+      "name": "thermos",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-plugins/thermos"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "x",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-plugins/x"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Integrations"
+    },
+    {
+      "name": "x-money",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-plugins/x-money"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Integrations"
+    }
+  ]
+}

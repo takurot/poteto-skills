@@ -1,0 +1,37 @@
+{
+  "name": "x",
+  "version": "2.11.1+poteto.7fa003c",
+  "description": "Search posts, read timelines, pull trends, explore Spaces and communities, manage lists and bookmarks, access X Chat, schedule X calls, and manage livestreams.",
+  "author": {
+    "name": "Cursor"
+  },
+  "homepage": "https://docs.x.com/tools/mcp",
+  "repository": "https://github.com/cursor/plugins",
+  "license": "MIT",
+  "keywords": [
+    "x",
+    "twitter",
+    "posts",
+    "search",
+    "trends",
+    "news",
+    "spaces",
+    "communities",
+    "lists",
+    "bookmarks",
+    "calls",
+    "livestream",
+    "chat",
+    "social",
+    "mcp"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "X",
+    "shortDescription": "Search posts, read timelines, pull trends, explore Spaces and communities, manage lists and...",
+    "longDescription": "Search posts, read timelines, pull trends, explore Spaces and communities, manage lists and bookmarks, access X Chat, schedule X calls, and manage livestreams.",
+    "developerName": "Cursor",
+    "category": "Integrations",
+    "websiteURL": "https://docs.x.com/tools/mcp"
+  }
+}

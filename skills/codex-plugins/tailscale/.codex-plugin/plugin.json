@@ -1,0 +1,31 @@
+{
+  "name": "tailscale",
+  "version": "1.0.6+poteto.6734de7",
+  "description": "Let Grok Bot reach your private Tailscale network. Connect your own tailnet in one click: Grok Bot's computer reaches your tailnet hosts by name, and Grok Bot can use MCP servers running on them. Company tailnets for teams are in beta.",
+  "author": {
+    "name": "Cursor"
+  },
+  "homepage": "https://tailscale.com",
+  "repository": "https://github.com/cursor/plugins",
+  "license": "MIT",
+  "keywords": [
+    "tailscale",
+    "tailnet",
+    "wireguard",
+    "vpn",
+    "private network",
+    "networking",
+    "self-hosted",
+    "grok",
+    "mcp"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Tailscale",
+    "shortDescription": "Let Grok Bot reach your private Tailscale network.",
+    "longDescription": "Let Grok Bot reach your private Tailscale network. Connect your own tailnet in one click: Grok Bot's computer reaches your tailnet hosts by name, and Grok Bot can use MCP servers running on them. Company tailnets for teams are in beta.",
+    "developerName": "Cursor",
+    "category": "Integrations",
+    "websiteURL": "https://tailscale.com"
+  }
+}

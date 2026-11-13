@@ -1,0 +1,5 @@
+interface:
+  display_name: "Dyl Review"
+  short_description: "Review one or more PRs in Dylan's style: up to 7..."
+policy:
+  allow_implicit_invocation: false

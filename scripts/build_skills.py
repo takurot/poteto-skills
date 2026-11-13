@@ -16,10 +16,16 @@ from pathlib import Path
 
 import yaml
 
+try:
+    from scripts import codex_plugins
+except ImportError:  # run as a script from the scripts directory
+    import codex_plugins
+
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SOURCE = ROOT / "ref" / "plugins"
 DEFAULT_OUTPUT = ROOT / "skills"
 UPSTREAM_REPOSITORY = "https://github.com/cursor/plugins"
+DEFAULT_MARKETPLACE = ROOT / ".agents" / "plugins" / "marketplace.json"
 ALLOWED_NAME = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 SUPPORTED_FRONTMATTER_FIELDS = {
     "name",
@@ -1169,6 +1175,8 @@ def verify_generated_output(output: Path) -> None:
         )
         if not all(path.is_file() for path in required):
             raise ValueError(f"{output}: incomplete generated files for {name}")
+    if manifest.get("schema_version", 0) >= 3:
+        codex_plugins.verify_plugins(output, manifest.get("codex_plugins"))
 
 
 def assert_safe_output(output: Path, source: Path, force: bool) -> None:
@@ -1208,7 +1216,12 @@ def activate_generated_output(temporary: Path, output: Path) -> None:
         shutil.rmtree(backup)
 
 
-def build(source: Path, output: Path, force: bool = False) -> None:
+def build(
+    source: Path,
+    output: Path,
+    force: bool = False,
+    marketplace_output: Path | None = None,
+) -> None:
     source = source.resolve()
     if output.is_symlink():
         raise ValueError(f"refusing symlink output directory: {output}")
@@ -1242,6 +1255,13 @@ def build(source: Path, output: Path, force: bool = False) -> None:
                 }
             )
 
+        plugin_entries = codex_plugins.write_plugins(
+            codex_plugins.plan_plugins(skills, EXPERIMENTAL_SKILLS),
+            temporary / "codex",
+            temporary / codex_plugins.PLUGIN_DIRECTORY,
+            UPSTREAM_REPOSITORY,
+        )
+
         claude_manifest_dir = temporary / "claude-code" / ".claude-plugin"
         claude_manifest_dir.mkdir(parents=True)
         (claude_manifest_dir / "plugin.json").write_text(
@@ -1259,12 +1279,13 @@ def build(source: Path, output: Path, force: bool = False) -> None:
         )
 
         manifest = {
-            "schema_version": 2,
+            "schema_version": 3,
             "generator": "scripts/build_skills.py",
             "source": UPSTREAM_REPOSITORY,
             "source_revision": revision,
             "skill_count": len(skills),
             "skills": manifest_skills,
+            "codex_plugins": plugin_entries,
             "files": generated_file_hashes(temporary),
         }
         (temporary / "manifest.json").write_text(
@@ -1276,6 +1297,8 @@ def build(source: Path, output: Path, force: bool = False) -> None:
         )
         verify_generated_output(temporary)
         activate_generated_output(temporary, output)
+        if marketplace_output is not None:
+            codex_plugins.write_marketplace(marketplace_output, plugin_entries)
     finally:
         if temporary.exists():
             shutil.rmtree(temporary)
@@ -1291,9 +1314,18 @@ def main() -> None:
         action="store_true",
         help="replace recognized generated output even when checksums do not match",
     )
+    parser.add_argument(
+        "--marketplace",
+        type=Path,
+        help="write the Codex marketplace catalog here "
+        "(default: .agents/plugins/marketplace.json when --output is the repository skills directory)",
+    )
     args = parser.parse_args()
+    marketplace = args.marketplace
+    if marketplace is None and args.output.resolve() == DEFAULT_OUTPUT.resolve():
+        marketplace = DEFAULT_MARKETPLACE
     try:
-        build(args.source, args.output, force=args.force)
+        build(args.source, args.output, force=args.force, marketplace_output=marketplace)
     except ValueError as error:
         parser.error(str(error))
 

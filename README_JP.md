@@ -10,6 +10,7 @@ Cursor 公式プラグイン集 [`cursor/plugins`](https://github.com/cursor/plu
 
 - `skills/claude-code/skills/` — Claude Code 用 Skills（親ディレクトリは検証可能な Claude Code plugin）
 - `skills/codex/` — Codex 用 Skills（`agents/openai.yaml` を含む）
+- `skills/codex-plugins/` と `.agents/plugins/marketplace.json` — 同じ Codex 用 Skills を、upstream の Cursor plugin ごとに 1 つの Codex plugin としてまとめたものと、それを一覧するマーケットプレイスのカタログ
 - `install.sh` — ユーザー単位またはプロジェクト単位のインストーラ
 - `scripts/build_skills.py` — `ref/plugins` から配布物を再生成する変換スクリプト
 - `skills/manifest.json` — 変換元、ライセンス、バージョン、互換性上の注意、生成ファイルchecksumを記録したマニフェスト
@@ -77,6 +78,24 @@ Claude Code は `<project>/.claude/skills/`、Codex は `<project>/.agents/skill
 
 強制更新はインストール先と同じファイルシステムでステージングします。既存Skillのバックアップ後に有効化が失敗した場合、元のSkillを自動で復元し、一時ステージングディレクトリを削除します。
 
+## Codex plugin
+
+Codex 用 Skills は、upstream の Cursor plugin ごとに 1 つの Codex plugin(22 個、109 Skills)としてもまとめ、`.agents/plugins/marketplace.json` に載せています。`install.sh` の代わりに使えます。
+
+```bash
+codex plugin marketplace add takurot/poteto-skills
+codex plugin list
+codex plugin add pstack@poteto-skills
+```
+
+- plugin の Skill は `<plugin>:<skill>` という名前になります。pstack のモードは `$pstack:poteto-mode` です。モデルの Skill 一覧に出るのは暗黙呼び出しを許す Skill だけで、明示専用の Skill は名前を指定したときに動きます。
+- 更新は `codex plugin marketplace upgrade poteto-skills`、削除は `codex plugin remove pstack@poteto-skills` です。
+- plugin のバージョンは `<upstream のバージョン>+poteto.<内容のハッシュ>` なので、再生成で内容が変わると新しいバージョンとして入ります。
+- 同じ Skill を `install.sh` と plugin の両方でインストールしないでください。名前が重なり、plugin 側は名前空間付きになります。
+- `dyl-stack` は `pstack` plugin を前提にします(`setup-pstack` の隣から探します)。
+- フックは同梱しません。`ralph-loop`、`advisor`、`continual-learning` は手動の代替のままです。フック付き plugin は #25 で扱います。
+- 実験的な `docs-canvas` は含めません。名前付きの Cursor サブエージェントは登録しません。
+
 ## 変換方針
 
 Claude Code と Codex は Skill frontmatter の仕様が異なるため、配布物を分けています。
@@ -100,7 +119,7 @@ dependency directoryを拒否します。MIT宣言と一致する変換元 `LICE
 
 Skill の文章やローカルスクリプトは移植できますが、Cursor 固有のランタイムそのものは同梱していません。
 
-- Cursor hooks に依存する自動反復や終了割り込みは、Claude Code/Codex では自動実行されません。
+- Cursor hooks に依存する自動反復や終了割り込みは、Claude Code/Codex では自動実行されません。Codex は plugin にフックを同梱できますが、別途の移植が必要です(#25)。
 - Cursor Canvas は、利用できない場合に通常の HTML 成果物へフォールバックする注記を追加しています。
 - MCP を使う Skills は、対応する MCP サーバーを Claude Code/Codex 側で別途設定する必要があります。
 - Cursor SDK や Cursor Cloud Agents を操作する Skill は、引き続き Cursor の認証情報とサービスを必要とします。
@@ -121,7 +140,7 @@ python3 scripts/build_skills.py
 python3 scripts/validate_generated.py skills
 ```
 
-`ref/` はこのリポジトリには含めません。すでに `ref/plugins` がある場合は、そのリポジトリを更新してから変換してください。変換スクリプトは `plugin.json` の `skills` 宣言だけを探索し、`skills/` を決定的に再生成します。
+`ref/` はこのリポジトリには含めません。すでに `ref/plugins` がある場合は、そのリポジトリを更新してから変換してください。変換スクリプトは `plugin.json` の `skills` 宣言だけを探索し、`skills/` と `.agents/plugins/marketplace.json` を決定的に再生成します。
 
 manifestとsidecar checksumで生成treeを保護します。通常の再生成は、変更・追加・欠落した
 生成ファイルがあると拒否します。ローカル作業を確認・退避し、認識済み生成treeを意図的に

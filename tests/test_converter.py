@@ -252,7 +252,7 @@ class OutputSafetyTests(ConverterFixture):
         manifest_file = self.output / "manifest.json"
         manifest_file.write_text(
             manifest_file.read_text(encoding="utf-8").replace(
-                '"schema_version": 2', '"schema_version": 999'
+                '"schema_version": 3', '"schema_version": 999'
             ),
             encoding="utf-8",
         )

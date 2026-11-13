@@ -1,0 +1,3 @@
+interface:
+  display_name: "Port Github App To Origin"
+  short_description: "Plans the port of an existing GitHub App to a Cursor Origin..."

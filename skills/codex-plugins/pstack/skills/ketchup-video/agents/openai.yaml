@@ -1,0 +1,5 @@
+interface:
+  display_name: "Ketchup Video"
+  short_description: "Catch the user up like /ketchup, with a short subtitled..."
+policy:
+  allow_implicit_invocation: false
