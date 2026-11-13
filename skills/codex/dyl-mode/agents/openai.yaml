@@ -1,0 +1,5 @@
+interface:
+  display_name: "Dyl Mode"
+  short_description: "Dylan's agent style on top of pstack: concise verified..."
+policy:
+  allow_implicit_invocation: false

@@ -32,6 +32,8 @@ SUPPORTED_FRONTMATTER_FIELDS = {
     "model",
     "readonly",
     "is_background",
+    "license",
+    "compatibility",
 }
 
 # These duplicate skills are either identical or have a more self-contained copy.
@@ -532,10 +534,50 @@ PSTACK_CONFIG_CONSUMERS = {
     "arena",
     "how",
     "interrogate",
+    "poteto-help",
+    "poteto-mode",
     "reflect",
     "swarm",
     "why",
 }
+
+PSTACK_PLUGIN = "pstack"
+PSTACK_CODEX_ADAPTER = ROOT / "scripts" / "adapters" / "pstack-codex.md"
+PSTACK_CODEX_ADAPTER_REFERENCE = "references/codex-adapter.md"
+
+PSTACK_SHAPE_PATTERN = re.compile(
+    r"Shape:\n\n```\n---\n.*?\n---\n(?P<lines>.*?)\n```", re.DOTALL
+)
+PSTACK_SAFE_COMMENTS = (
+    "# pstack model configuration. Consumers read this file explicitly.",
+    "# `inherit-parent` or `auto` means: omit the subagent model parameter.",
+    "# budget: medium (host-controlled)",
+)
+
+
+def replace_required(body: str, old: str, new: str, skill_name: str) -> str:
+    if old not in body:
+        raise ValueError(
+            f"{skill_name}: upstream text changed; update the conversion rule for: {old[:72]!r}"
+        )
+    return body.replace(old, new)
+
+
+def safe_pstack_shape(body: str, skill_name: str) -> str:
+    match = PSTACK_SHAPE_PATTERN.search(body)
+    if match is None:
+        raise ValueError(f"{skill_name}: upstream model-rule shape not found")
+    roles = [
+        line.split(":", 1)[0]
+        for line in match.group("lines").splitlines()
+        if line and not line.startswith("#")
+    ]
+    if not roles:
+        raise ValueError(f"{skill_name}: upstream model-rule shape lists no roles")
+    shape = "\n".join(
+        [*PSTACK_SAFE_COMMENTS, *(f"{role}: inherit-parent" for role in roles)]
+    )
+    return body[: match.start()] + f"Shape:\n\n```\n{shape}\n```" + body[match.end() :]
 
 
 def adapt_pstack_config(skill_name: str, body: str, models_file: str) -> str:
@@ -551,12 +593,16 @@ def adapt_pstack_config(skill_name: str, body: str, models_file: str) -> str:
     if skill_name != "setup-pstack":
         return body
 
-    body = body.replace(
+    def swap(old: str, new: str) -> None:
+        nonlocal body
+        body = replace_required(body, old, new, skill_name)
+
+    swap(
         f"Write `{models_file}`, an always-applied rule that sets pstack's model per role.",
         f"Write `{models_file}`, a shared configuration file that each converted pstack Skill "
         "reads explicitly. It is not loaded automatically by the host.",
     )
-    body = body.replace(
+    swap(
         "Enumerate the model slugs you can pass to a `Task` subagent in this session. That is "
         "the dependable source. If Cursor also exposes a models API or CLI that lists the "
         "user's entitled models, prefer it for completeness. If you cannot detect any, ask "
@@ -570,27 +616,22 @@ def adapt_pstack_config(skill_name: str, body: str, models_file: str) -> str:
         "use `inherit-parent`. Never write an unverified real identifier. The aliases "
         "`inherit-parent` and `auto` mean to omit the subagent model parameter.",
     )
-    body = body.replace(
-        "**(b) Apply it.** Build the working table from the skill defaults, and on a re-run "
-        "keep any role you changed by family, list, or alias (`inherit-parent`, `auto`). "
-        "`unlimited` leaves every effort as in that table. `large`, `medium`, and `small` set "
-        "the effort token of every real slug, panel entries included, to `xhigh`, `high`, or "
-        "`medium`. The effort token is the last token, or the one before a trailing `fast`, on "
-        "the ladder `max` > `xhigh` > `high` > `medium` > `low`. If the result is not a "
-        "detected slug, use the same family's detected slug with the highest effort at or "
-        "below the target, else mark the role as needing a choice. `inherit-parent` and `auto` "
-        "do not change. So `small` turns `claude-opus-5-5-max` into "
-        "`claude-opus-5-5-medium`, and `grok-4.7-xhigh-fast` into "
-        "`grok-4.7-medium-fast`.",
-        "**(b) Apply it.** Treat the budget as a selection preference, not as syntax inside a "
+    budget_start = body.find("**(b) Apply it.**")
+    budget_end = body.find("**(c) Show the roles and confirm.**")
+    if budget_start == -1 or budget_end == -1 or budget_end < budget_start:
+        raise ValueError(f"{skill_name}: upstream budget step not found")
+    body = (
+        body[:budget_start]
+        + "**(b) Apply it.** Treat the budget as a selection preference, not as syntax inside a "
         "model name. Choose only exact identifiers accepted by the current host. If the host "
         "exposes reasoning effort separately, set it through that interface. If it exposes "
         "distinct model identifiers for effort tiers, choose only an identifier present in "
         "the accepted set. Do not construct a model identifier by editing a suffix. When no "
         "accepted identifier satisfies the requested budget, mark the role as needing a "
-        "choice or use `inherit-parent` after confirmation.",
+        "choice or use `inherit-parent` after confirmation.\n\n"
+        + body[budget_end:]
     )
-    body = body.replace(
+    swap(
         f"Write `{models_file}` with `alwaysApply: true`, a `# budget` line with the chosen "
         "label and its target effort, and one line per role, using the same labels poteto-mode "
         "uses. Overwrite the whole file so re-runs stay idempotent. Shape:",
@@ -599,52 +640,8 @@ def adapt_pstack_config(skill_name: str, body: str, models_file: str) -> str:
         "explicitly. Overwrite the whole file so re-runs stay idempotent. Use only exact "
         "identifiers accepted by the current host. Shape:",
     )
-    old_shape = """---
-description: pstack per-role model choices (overrides skill defaults)
-alwaysApply: true
----
-# pstack model configuration. One line per role. Delete a line to fall back to the skill default.
-# `inherit-parent` or `auto` as a value: the role runs on the parent chat model (omit Task `model`). Alias entries in a panel list still count toward its fan-out.
-# budget: unlimited (max)
-feature, refactoring: grok-4.7-xhigh-fast
-bug-fix: grok-4.7-xhigh-fast
-perf-issue: grok-4.7-xhigh-fast
-hillclimb: grok-4.7-xhigh-fast
-judgment and prose: claude-opus-5-5-max
-hardest tasks: claude-opus-5-5-max
-how explorer: grok-4.7-xhigh-fast
-how explainer: claude-opus-5-5-max
-why investigators: grok-4.7-xhigh-fast
-why synthesizer: claude-opus-5-5-max
-reflect tooling: gpt-5.6-sol-max
-reflect judgment, divergent, synthesizer: claude-opus-5-5-max
-arena runners: claude-opus-5-5-max, gpt-5.6-sol-max, grok-4.7-xhigh-fast
-arena cross-judge pool: claude-opus-5-5-max, gpt-5.6-sol-max, grok-4.7-xhigh-fast
-swarm workers: grok-4.7-xhigh-fast
-architect runners: claude-opus-5-5-max, gpt-5.6-sol-max, grok-4.7-xhigh-fast
-interrogate reviewers: claude-opus-5-5-max, gpt-5.6-sol-max, grok-4.7-xhigh-fast"""
-    safe_shape = """# pstack model configuration. Consumers read this file explicitly.
-# `inherit-parent` or `auto` means: omit the subagent model parameter.
-# budget: medium (host-controlled)
-feature, refactoring: inherit-parent
-bug-fix: inherit-parent
-perf-issue: inherit-parent
-hillclimb: inherit-parent
-judgment and prose: inherit-parent
-hardest tasks: inherit-parent
-how explorer: inherit-parent
-how explainer: inherit-parent
-why investigators: inherit-parent
-why synthesizer: inherit-parent
-reflect tooling: inherit-parent
-reflect judgment, divergent, synthesizer: inherit-parent
-arena runners: inherit-parent
-arena cross-judge pool: inherit-parent
-swarm workers: inherit-parent
-architect runners: inherit-parent
-interrogate reviewers: inherit-parent"""
-    body = body.replace(old_shape, safe_shape)
-    body = body.replace(
+    body = safe_pstack_shape(body, skill_name)
+    swap(
         "Tell the user the rule was written and that it applies to new sessions. Re-running "
         "this skill updates it.",
         "Tell the user the shared file was written. Explain that it is not loaded "
@@ -705,6 +702,10 @@ not evidence that {host} or Cursor Canvas rendered a newly generated artifact; r
 rendering as unverified unless it was actually exercised.
 """
     return body.rstrip() + evaluation
+
+
+def uses_pstack_codex_adapter(skill: SourceSkill, target: str) -> bool:
+    return target == "codex" and skill.plugin_name == PSTACK_PLUGIN
 
 
 def adapt_body(skill: SourceSkill, target: str) -> str:
@@ -783,6 +784,14 @@ def adapt_body(skill: SourceSkill, target: str) -> str:
         "scan other project or user-session roots. If it is unavailable, audit the run from "
         "the current conversation and decision log.",
     )
+    body = body.replace(
+        "Before fanning out, find this conversation's transcript in the `agent-transcripts/` "
+        "directory the system prompt names. Do not glob across `~/.cursor/projects/*/`. That "
+        "crosses workspace boundaries and reads private chats from unrelated projects.",
+        "Before fanning out, use the current transcript only when the active host explicitly "
+        "exposes it. Do not scan other project or user-session roots. If no current transcript "
+        "is exposed, continue from the current conversation and live workspace state.",
+    )
     body = adapt_hookless_workflow(skill.name, body, host)
     body = adapt_pr_review_canvas(skill.name, body)
     body = adapt_pstack_config(skill.name, body, models_file)
@@ -794,6 +803,11 @@ def adapt_body(skill: SourceSkill, target: str) -> str:
         "> Use the host's equivalent tool or subagent interface when the text names a Cursor-specific control.",
         "> Never claim that an unavailable hook, MCP server, named agent, or Cursor service ran.",
     ]
+    if uses_pstack_codex_adapter(skill, target):
+        preface.append(
+            f"> Read `{PSTACK_CODEX_ADAPTER_REFERENCE}` in this Skill folder once per session. It "
+            "maps Cursor tools, subagent fields, models, paths, and Cursor-only features to Codex."
+        )
     preface.extend(f"> {note}" for note in notes)
     return "\n".join(preface) + "\n\n" + body.rstrip() + "\n"
 
@@ -875,6 +889,17 @@ def adapt_support_text(text: str, target: str) -> str:
         "host-installed Skill root explicitly exposed in the active session)",
     )
     text = text.replace(
+        "search `~/.cursor/plugins/` for a file whose path ends in `skills/poteto-mode/SKILL.md`. "
+        "If more than one file matches, use the copy whose `.cursor-plugin/plugin.json` has the "
+        "highest `version`.",
+        f"look for `{project_skills}poteto-mode/SKILL.md` in the workspace, then "
+        f"`{user_skills}poteto-mode/SKILL.md`. Use the first that exists.",
+    )
+    text = text.replace(
+        f"(under `{project_skills}`, `{user_skills}`, or `~/.cursor/plugins/`)",
+        f"(under `{project_skills}` or `{user_skills}`)",
+    )
+    text = text.replace(
         "Inspect only transcript files under "
         "`~/.cursor/projects/<workspace-slug>/agent-transcripts/` that are new or have newer "
         "mtimes than the index.",
@@ -948,6 +973,10 @@ def copy_support_files(skill: SourceSkill, destination: Path, target: str) -> No
 
     shutil.copy2(skill.license_file, destination / "LICENSE")
     adapt_copied_resources(destination, target)
+    if uses_pstack_codex_adapter(skill, target):
+        adapter = destination / PSTACK_CODEX_ADAPTER_REFERENCE
+        adapter.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(PSTACK_CODEX_ADAPTER, adapter)
 
 
 def short_description(description: str) -> str:

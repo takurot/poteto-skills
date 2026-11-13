@@ -4,7 +4,7 @@ description: "Use for \"automate me\", \"create/update/refresh my -mode skill\",
 disable-model-invocation: true
 ---
 
-> Claude Code compatibility: converted from Cursor plugin `pstack` v0.15.5.
+> Claude Code compatibility: converted from Cursor plugin `pstack` v0.15.36.
 > Use the host's equivalent tool or subagent interface when the text names a Cursor-specific control.
 > Never claim that an unavailable hook, MCP server, named agent, or Cursor service ran.
 > Cursor transcript paths are not portable; use only an equivalent transcript source exposed by the active host.
@@ -33,7 +33,7 @@ Update mode changes the rest of the flow:
 
 Before fanning out, use workspace transcripts only when the active host explicitly exposes them. Do not scan other project or user-session roots. If transcripts are not available, continue from the current conversation and live workspace state.
 
-Survey recent agent conversations within that scope for recurring patterns. Run multiple parallel subagents across slices of history (e.g. last 2-4 weeks, split into 3 slices so each has enough material). Each slice mining subagent reads transcripts from the workspace-scoped path the parent provides, looks for the signals below, and returns a short structured list of patterns it saw with evidence pointers. Default signals worth hunting:
+Survey recent agent conversations within that scope for recurring patterns. Run multiple parallel subagents across slices of history (e.g. last 2-4 weeks, split into 3 slices so each has enough material). Pick each subagent's reasoning level and fast or standard speed for the job, per the Subagents section of the **poteto-mode** skill. Each slice mining subagent reads transcripts from the workspace-scoped path the parent provides, looks for the signals below, and returns a short structured list of patterns it saw with evidence pointers. Default signals worth hunting:
 
 - Response preferences (length, tone, format, "dumb it down" corrections)
 - Delegation habits (subagents, models, specialized workflows, parallelism)

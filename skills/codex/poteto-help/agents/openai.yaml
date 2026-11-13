@@ -1,0 +1,5 @@
+interface:
+  display_name: "Poteto Help"
+  short_description: "Guides users through pstack setup, /poteto-mode, and picking..."
+policy:
+  allow_implicit_invocation: false

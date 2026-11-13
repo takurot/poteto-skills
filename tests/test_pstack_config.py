@@ -8,6 +8,8 @@ CONSUMERS = (
     "arena",
     "how",
     "interrogate",
+    "poteto-help",
+    "poteto-mode",
     "reflect",
     "swarm",
     "why",

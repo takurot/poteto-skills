@@ -1,0 +1,5 @@
+interface:
+  display_name: "Principle Explain The Number"
+  short_description: "Apply before you measure, and before you trust, report, or..."
+policy:
+  allow_implicit_invocation: false
