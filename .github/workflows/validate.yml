@@ -35,22 +35,23 @@ jobs:
         run: |
           source_revision=$(python -c 'import json; print(json.load(open("skills/manifest.json"))["source_revision"])')
           # Anonymous clones from shared runners are intermittently rate-limited (HTTP 429).
-          # Authenticate the clone and retry with a growing delay.
+          # Authenticate every network step and retry with a growing delay. The blobless
+          # clone fetches file contents during checkout, so checkout needs the header too.
           auth=$(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 | tr -d '\n')
           echo "::add-mask::${auth}"
+          header="http.extraheader=AUTHORIZATION: basic ${auth}"
           for attempt in 1 2 3 4 5; do
             rm -rf upstream-plugins
-            if git -c "http.extraheader=AUTHORIZATION: basic ${auth}" \
-              clone --filter=blob:none https://github.com/cursor/plugins.git upstream-plugins; then
+            if git -c "$header" clone --filter=blob:none https://github.com/cursor/plugins.git upstream-plugins \
+              && git -c "$header" -C upstream-plugins checkout "$source_revision"; then
               break
             fi
             if [ "$attempt" = 5 ]; then
-              echo "could not clone cursor/plugins after $attempt attempts" >&2
+              echo "could not fetch cursor/plugins at $source_revision after $attempt attempts" >&2
               exit 1
             fi
             sleep $((attempt * 20))
           done
-          git -C upstream-plugins checkout "$source_revision"
           python scripts/build_skills.py --source upstream-plugins --output regenerated-skills
           python scripts/validate_generated.py regenerated-skills
           diff -qr skills regenerated-skills
