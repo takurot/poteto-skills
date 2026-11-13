@@ -165,13 +165,15 @@ class CommittedPluginTreeTests(unittest.TestCase):
         for entry in self.marketplace["plugins"]:
             with self.subTest(plugin=entry["name"]):
                 root = ROOT / entry["source"]["path"]
-                self.assertTrue((root / "plugin.json").is_file())
+                self.assertEqual((root / "plugin.json").is_file(), entry["name"] != "codex-hooks")
                 self.assertTrue((root / ".codex-plugin" / "plugin.json").is_file())
                 self.assertTrue((root / "LICENSE").is_file())
 
     def test_every_converted_skill_ships_in_exactly_one_default_plugin(self) -> None:
         shipped: dict[str, str] = {}
         for plugin in self.manifest["codex_plugins"]:
+            if plugin.get("variant") == "hooks":
+                continue
             for skill in plugin["skills"]:
                 self.assertNotIn(skill, shipped)
                 shipped[skill] = plugin["name"]
@@ -182,12 +184,63 @@ class CommittedPluginTreeTests(unittest.TestCase):
 
     def test_plugin_skills_match_the_codex_distribution(self) -> None:
         for plugin in self.manifest["codex_plugins"]:
+            if plugin.get("variant") == "hooks":
+                continue
             root = ROOT / "skills" / "codex-plugins" / plugin["name"]
             for skill in plugin["skills"]:
                 with self.subTest(plugin=plugin["name"], skill=skill):
                     self.assertEqual(
                         tree(root / "skills" / skill), tree(ROOT / "skills" / "codex" / skill)
                     )
+
+
+class HookPluginGenerationTests(PluginGenerationTests):
+    def add_hook_plugins(self):
+        ralph = self.add_plugin('ralph-loop', 'ralph-loop')
+        for name in ('cancel-ralph', 'ralph-loop-help'):
+            directory = ralph.parent / name
+            directory.mkdir()
+            (directory / 'SKILL.md').write_text('---\nname: ' + name + '\ndescription: Test workflow\n---\n')
+        self.add_plugin('advisor', 'advisor')
+        self.add_plugin('continual-learning', 'continual-learning')
+
+    def test_hook_variant_is_separate_and_default_skills_stay_equal(self):
+        self.add_hook_plugins()
+        manifest = self.build()
+        entry = next(e for e in manifest['codex_plugins'] if e['name'] == 'codex-hooks')
+        self.assertEqual(entry['variant'], 'hooks')
+        self.assertEqual(len(entry['skills']), 5)
+        self.assertEqual(tree(self.plugin('ralph-loop') / 'skills/ralph-loop'), tree(self.output / 'codex/ralph-loop'))
+        compat = json.loads((self.plugin('codex-hooks') / '.codex-plugin/plugin.json').read_text())
+        self.assertEqual(compat['hooks'], './hooks/hooks.json')
+        self.assertFalse((self.plugin('codex-hooks') / 'plugin.json').exists())
+        build_skills.verify_generated_output(self.output)
+
+    def test_runtime_changes_update_hook_version(self):
+        self.add_hook_plugins()
+        first = self.build()
+        source = self.root / 'hook-resources'
+        import shutil
+        shutil.copytree(codex_plugins.HOOK_SOURCE, source, ignore=shutil.ignore_patterns('__pycache__'))
+        runtime = source / 'runtime.py'
+        runtime.write_text(runtime.read_text() + '\n')
+        with mock.patch.object(codex_plugins, 'HOOK_SOURCE', source):
+            changed = self.build(force=True)
+        version = lambda document: next(e['version'] for e in document['codex_plugins'] if e['name'] == 'codex-hooks')
+        self.assertNotEqual(version(first), version(changed))
+
+    def test_validator_rejects_unregistered_variant_and_altered_hooks(self):
+        self.add_hook_plugins()
+        manifest = self.build()
+        entry = next(e for e in manifest['codex_plugins'] if e['name'] == 'codex-hooks')
+        entry['variant'] = 'other'
+        with self.assertRaises(ValueError):
+            codex_plugins.verify_plugins(self.output, manifest['codex_plugins'])
+        entry['variant'] = 'hooks'
+        hookfile = self.plugin('codex-hooks') / 'hooks/hooks.json'
+        hookfile.write_text('{"hooks": {}}')
+        with self.assertRaises(ValueError):
+            codex_plugins.verify_plugins(self.output, manifest['codex_plugins'])
 
 
 if __name__ == "__main__":

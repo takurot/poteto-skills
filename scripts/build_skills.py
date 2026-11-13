@@ -1262,6 +1262,12 @@ def build(
             UPSTREAM_REPOSITORY,
         )
 
+        plugin_entries.extend(
+            codex_plugins.write_hook_plugin(
+                skills, temporary / codex_plugins.PLUGIN_DIRECTORY, UPSTREAM_REPOSITORY
+            )
+        )
+
         claude_manifest_dir = temporary / "claude-code" / ".claude-plugin"
         claude_manifest_dir.mkdir(parents=True)
         (claude_manifest_dir / "plugin.json").write_text(
