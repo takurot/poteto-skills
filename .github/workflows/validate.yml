@@ -30,9 +30,24 @@ jobs:
           python -m json.tool skills/manifest.json >/dev/null
           python scripts/validate_generated.py skills
       - name: Rebuild both host distributions from the pinned source
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           source_revision=$(python -c 'import json; print(json.load(open("skills/manifest.json"))["source_revision"])')
-          git clone --filter=blob:none https://github.com/cursor/plugins.git upstream-plugins
+          # Anonymous clones from shared runners are intermittently rate-limited (HTTP 429).
+          # Authenticate the clone and retry with a growing delay.
+          for attempt in 1 2 3 4 5; do
+            rm -rf upstream-plugins
+            if git -c "http.extraheader=AUTHORIZATION: bearer ${GITHUB_TOKEN}" \
+              clone --filter=blob:none https://github.com/cursor/plugins.git upstream-plugins; then
+              break
+            fi
+            if [ "$attempt" = 5 ]; then
+              echo "could not clone cursor/plugins after $attempt attempts" >&2
+              exit 1
+            fi
+            sleep $((attempt * 20))
+          done
           git -C upstream-plugins checkout "$source_revision"
           python scripts/build_skills.py --source upstream-plugins --output regenerated-skills
           python scripts/validate_generated.py regenerated-skills
