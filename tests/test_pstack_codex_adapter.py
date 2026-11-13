@@ -50,6 +50,24 @@ class PstackCodexAdapterTests(unittest.TestCase):
                 self.assertIn(needle, text)
         self.assertNotIn("Claude", text)
 
+    def test_adapter_matches_the_checked_codex_tool_surface(self) -> None:
+        text = (ROOT / "scripts" / "adapters" / "pstack-codex.md").read_text()
+        for needle in (
+            "task_name",
+            'fork_turns: "none"',
+            "followup_task",
+            "`timeout_ms`",
+            "$<plugin>:<name>",
+            "0.169.0",
+        ):
+            with self.subTest(needle=needle):
+                self.assertIn(needle, text)
+        for removed in ('agent_type: "poteto-agent"', "Call `close_agent`"):
+            with self.subTest(removed=removed):
+                self.assertNotIn(removed, text)
+        resume_row = next(line for line in text.splitlines() if line.startswith("| `resume` |"))
+        self.assertIn("followup_task", resume_row)
+
     def test_poteto_agent_definition_resolves_codex_skill_roots(self) -> None:
         text = (
             ROOT / "skills" / "codex" / "poteto-mode" / "references" / "cursor-agents" / "poteto-agent.md"
