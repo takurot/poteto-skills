@@ -10,6 +10,7 @@ A distribution of Skills from the official [`cursor/plugins`](https://github.com
 
 - `skills/claude-code/skills/` — Skills for Claude Code; its parent directory is also a validatable Claude Code plugin
 - `skills/codex/` — Skills for Codex, including `agents/openai.yaml`
+- `skills/codex-plugins/` and `.agents/plugins/marketplace.json` — the same Codex Skills packaged as one Codex plugin per upstream Cursor plugin, and the marketplace catalog that lists them
 - `install.sh` — Installer for user-level or project-level installation
 - `scripts/build_skills.py` — Conversion script that regenerates the distributions from `ref/plugins`
 - `skills/manifest.json` — Manifest recording source paths, licenses, versions, compatibility notes, and generated-file checksums
@@ -78,6 +79,24 @@ Backups are kept outside active Skill discovery directories:
 
 Forced updates are staged on the destination filesystem. If activation fails after the existing Skill is backed up, the installer restores that original Skill automatically and removes its temporary staging directory.
 
+## Codex plugins
+
+The Codex Skills are also packaged as Codex plugins, one per upstream Cursor plugin (22 plugins, 109 Skills), and listed in `.agents/plugins/marketplace.json`. This is an alternative to `install.sh`.
+
+```bash
+codex plugin marketplace add takurot/poteto-skills
+codex plugin list
+codex plugin add pstack@poteto-skills
+```
+
+- Skills from a plugin are named `<plugin>:<skill>`, so pstack's mode is `$pstack:poteto-mode`. Only Skills that allow implicit invocation appear in the model's Skill list. The explicit-only ones run when you name them.
+- Upgrade with `codex plugin marketplace upgrade poteto-skills`. Remove with `codex plugin remove pstack@poteto-skills`.
+- A plugin's version is `<upstream version>+poteto.<content hash>`, so any regenerated content installs as a new version.
+- Do not install the same Skill with both `install.sh` and a plugin. The two copies share names and the plugin one is namespaced.
+- `dyl-stack` expects the `pstack` plugin, which it finds beside `setup-pstack`.
+- Hooks are not bundled. `ralph-loop`, `advisor`, and `continual-learning` keep their manual fallbacks. Hook-enabled plugins are tracked in #25.
+- The experimental `docs-canvas` Skill is not packaged. Named Cursor subagents are not registered.
+
 ## Conversion policy
 
 Claude Code and Codex use different Skill frontmatter formats, so this repository provides separate distributions.
@@ -102,7 +121,7 @@ directories. A declared MIT license and a matching upstream `LICENSE` file are r
 
 Skill instructions and local resources can be converted, but Cursor-specific runtime capabilities are not bundled.
 
-- Automated repetition and stop interception that depend on Cursor hooks do not run automatically in Claude Code or Codex.
+- Automated repetition and stop interception that depend on Cursor hooks do not run automatically in Claude Code or Codex. Codex can bundle plugin hooks, which needs a separate port (#25).
 - Skills that use Cursor Canvas include a fallback to a standalone HTML artifact when Canvas is unavailable.
 - Skills that use MCP require the corresponding MCP server to be configured separately in Claude Code or Codex.
 - Skills that operate the Cursor SDK or Cursor Cloud Agents still require Cursor credentials and services.
@@ -123,7 +142,7 @@ python3 scripts/build_skills.py
 python3 scripts/validate_generated.py skills
 ```
 
-The `ref/` directory is not included in this repository. If `ref/plugins` already exists, update that repository before converting. The builder discovers only the `skills` directories declared by `plugin.json` and deterministically regenerates `skills/`.
+The `ref/` directory is not included in this repository. If `ref/plugins` already exists, update that repository before converting. The builder discovers only the `skills` directories declared by `plugin.json` and deterministically regenerates `skills/` and `.agents/plugins/marketplace.json`.
 
 The manifest and its sidecar checksum protect the generated tree. A normal rebuild
 refuses modified, added, or missing generated files. Review and preserve local work;

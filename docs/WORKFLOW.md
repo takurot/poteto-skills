@@ -1,6 +1,6 @@
 # poteto-skills Development Workflow
 
-**Last updated:** 2026-09-29
+**Last updated:** 2026-11-13
 **Applies to:** `takurot/poteto-skills`
 
 This document defines how to update the Cursor source snapshot, convert Skills for
@@ -16,8 +16,10 @@ Review these sources before making a change:
 2. [`README.md`](../README.md) for the public installation and compatibility
    contract.
 3. [`skills/manifest.json`](../skills/manifest.json) for the converted Skill
-   inventory, upstream paths, plugin versions, compatibility notes, and source
-   revision.
+   inventory, upstream paths, plugin versions, compatibility notes, source
+   revision, and the Codex plugin inventory. The Codex plugins live in
+   `skills/codex-plugins/` and are listed by
+   [`.agents/plugins/marketplace.json`](../.agents/plugins/marketplace.json).
 4. [`scripts/build_skills.py`](../scripts/build_skills.py) for conversion policy.
 5. [`install.sh`](../install.sh) for installation, conflict, and backup behavior.
 6. The exact `cursor/plugins` revision recorded by `source_revision` when the
@@ -135,6 +137,10 @@ python3 scripts/build_skills.py --source ref/plugins --output skills
 python3 scripts/validate_generated.py skills
 ```
 
+With the repository `skills` directory as output, the build also rewrites
+`.agents/plugins/marketplace.json`, and the validator also checks it. For any
+other output directory, pass `--marketplace <file>` to both commands.
+
 If the checksum policy reports local generated changes, inspect and preserve them.
 Use `--force` only when intentionally replacing that recognized generated tree.
 
@@ -235,6 +241,20 @@ All reported counts must agree. Also verify:
 - each Skill retains its applicable upstream license;
 - removed upstream Skills are intentional and documented.
 
+For the Codex plugins, also verify:
+
+- every default Skill ships in exactly one plugin, and each plugin's Skills are
+  byte-identical to `skills/codex/`;
+- the marketplace catalog matches `manifest.json` and every `source.path`
+  exists inside the repository;
+- each plugin has both manifests, a `LICENSE`, and a version of the form
+  `<upstream version>+poteto.<hash>` that changes when its content changes;
+- a clean, isolated Codex home can add the marketplace and install every plugin
+  (`CODEX_HOME=<temp dir> codex plugin marketplace add <repo>`, then
+  `codex plugin add <name>@poteto-skills`), and `codex debug prompt-input`
+  lists the implicit Skills as `<plugin>:<skill>`. Never use the real
+  `~/.codex` for this check.
+
 ### 6.3 Determinism
 
 Build twice from the same clean upstream revision into separate temporary
@@ -243,9 +263,12 @@ directories and compare them:
 ```bash
 first_output=$(mktemp -d /tmp/poteto-skills-first.XXXXXX)
 second_output=$(mktemp -d /tmp/poteto-skills-second.XXXXXX)
-python3 scripts/build_skills.py --source ref/plugins --output "$first_output/generated"
-python3 scripts/build_skills.py --source ref/plugins --output "$second_output/generated"
+python3 scripts/build_skills.py --source ref/plugins --output "$first_output/generated" \
+  --marketplace "$first_output/marketplace.json"
+python3 scripts/build_skills.py --source ref/plugins --output "$second_output/generated" \
+  --marketplace "$second_output/marketplace.json"
 diff -qr "$first_output/generated" "$second_output/generated"
+diff -q "$first_output/marketplace.json" "$second_output/marketplace.json"
 ```
 
 A difference is a failure. Record the upstream commit and do not describe a build
@@ -299,6 +322,7 @@ Update documentation in the same change when behavior changes:
 | Conversion policy or supported field | Both READMEs, manifest expectations, tests |
 | Skill count or source revision | Generated manifest and relevant README text |
 | Compatibility boundary | Both READMEs, affected Skill notes, evaluation fixtures |
+| Codex plugin packaging, version rule, or marketplace entry | Both READMEs, this workflow, plugin tests |
 | License handling | Root license section, bundled licenses, converter tests |
 | Development or release procedure | This workflow |
 
