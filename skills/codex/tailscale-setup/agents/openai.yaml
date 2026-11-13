@@ -1,0 +1,3 @@
+interface:
+  display_name: "Tailscale Setup"
+  short_description: "Connect Grok Bot to Tailscale on a company tailnet (a team..."

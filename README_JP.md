@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-**最終更新:** 2026-09-29
+**最終更新:** 2026-11-13
 
 Cursor 公式プラグイン集 [`cursor/plugins`](https://github.com/cursor/plugins) の Skills を、Claude Code と Codex で読み込める形式に変換した配布リポジトリです。
 
@@ -15,7 +15,7 @@ Cursor 公式プラグイン集 [`cursor/plugins`](https://github.com/cursor/plu
 - `skills/manifest.json` — 変換元、ライセンス、バージョン、互換性上の注意、生成ファイルchecksumを記録したマニフェスト
 
 変換対象は各 Cursor プラグインの `plugin.json` が `skills` として宣言したものだけです。MCP 設定しか持たないプラグインは Skills ではないため変換しません。重複する2組は、付属ファイルが充実した版または本来のプラグイン側の版に統合しています。
-現在の参照 revision からは、各ホスト向けに91個の Skills を生成します。
+現在の参照 revision からは、各ホスト向けに110個の Skills を生成します。
 
 ## インストール
 
@@ -57,7 +57,7 @@ Claude Code は `<project>/.claude/skills/`、Codex は `<project>/.agents/skill
 `--skill` には空でない正確な Skill 名を1つ指定してください。複数選択する場合はオプションを
 繰り返し、全 Skill をインストールする場合だけ `--skill` を省略します。
 
-既定セットは、現在production-readyな90個のSkillをインストールします。`docs-canvas` は
+既定セットは、現在production-readyな109個のSkillをインストールします。`docs-canvas` は
 `--list` には表示されますが、変換元のワークフローがplaceholderのため既定対象から除外します。
 ホスト別fallbackと同梱スモーク成果物を評価する場合だけ `--skill docs-canvas` で明示的に選択してください。
 インストーラはexperimental警告を表示します。
@@ -104,6 +104,7 @@ Skill の文章やローカルスクリプトは移植できますが、Cursor �
 - MCP を使う Skills は、対応する MCP サーバーを Claude Code/Codex 側で別途設定する必要があります。
 - Cursor SDK や Cursor Cloud Agents を操作する Skill は、引き続き Cursor の認証情報とサービスを必要とします。
 - 固有名の subagent は自動登録しません。元の agent 定義を `references/cursor-agents/` に同梱しているので、利用可能な汎用 subagent へのプロンプトとして使います。
+- Codex 上の pstack: 変換済みの各 pstack Skill は `references/codex-adapter.md`(原本: `scripts/adapters/pstack-codex.md`)を同梱します。`Task` は `spawn_agent`/`wait_agent`/`close_agent`、`AskQuestion` は `request_user_input`、todo リストは `update_plan`、名前付きサブエージェントは登録済みの `~/.codex/agents/<name>.toml` または同梱定義を使った brief、現在の transcript は `$CODEX_THREAD_ID` の rollout ファイルに対応づけます。Cursor Automations、`/loop`、Cursor クラウドエージェントは、実行したと報告せず 1 行の注記でスキップします。
 - `setup-pstack` はホスト別の共有 Markdown ファイルを書き込みます。ホスト自体が設定として自動読込するのではなく、変換済みの pstack Skills が呼び出し時に明示的に読み、そのホストが受理したモデル識別子だけを使用します。
 
 各 Skill の先頭にも、利用ホストで存在しない機能を実行済みと扱わないための互換性注記があります。個別の制約は `skills/manifest.json` で確認できます。

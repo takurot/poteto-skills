@@ -1,0 +1,3 @@
+interface:
+  display_name: "Google Drive"
+  short_description: "Work with Google Drive through its MCP tools - search, read,..."

@@ -1,0 +1,3 @@
+interface:
+  display_name: "Origin Api"
+  short_description: "Routes questions about the Cursor Origin API to the right..."

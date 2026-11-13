@@ -85,6 +85,8 @@ class SupportResourceAdaptationTests(unittest.TestCase):
                 except UnicodeDecodeError:
                     continue
                 skill_name = path.relative_to(root).parts[0]
+                if path.name == "codex-adapter.md":
+                    continue
                 if skill_name in CURSOR_DEVELOPMENT_ALLOWLIST:
                     continue
                 for marker in UNSUPPORTED_CURSOR_PATHS:

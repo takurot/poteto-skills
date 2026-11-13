@@ -2,7 +2,7 @@
 
 [日本語](README_JP.md)
 
-**Last updated:** 2026-09-29
+**Last updated:** 2026-11-13
 
 A distribution of Skills from the official [`cursor/plugins`](https://github.com/cursor/plugins) collection, converted into formats that Claude Code and Codex can load.
 
@@ -14,7 +14,7 @@ A distribution of Skills from the official [`cursor/plugins`](https://github.com
 - `scripts/build_skills.py` — Conversion script that regenerates the distributions from `ref/plugins`
 - `skills/manifest.json` — Manifest recording source paths, licenses, versions, compatibility notes, and generated-file checksums
 
-Only Skills declared by each Cursor plugin's `plugin.json` are converted. Plugins that contain only MCP configuration are not converted because they are not Skills. Two duplicate Skill pairs are consolidated by selecting either the more self-contained copy or the copy from the canonical plugin. The current source revision generates 91 Skills for each host.
+Only Skills declared by each Cursor plugin's `plugin.json` are converted. Plugins that contain only MCP configuration are not converted because they are not Skills. Two duplicate Skill pairs are consolidated by selecting either the more self-contained copy or the copy from the canonical plugin. The current source revision generates 110 Skills for each host.
 
 ## Installation
 
@@ -56,7 +56,7 @@ You can also select individual Skills:
 Each `--skill` value must be a non-empty, exact Skill name. Repeat the option to
 select multiple Skills; omit it entirely to install all Skills.
 
-The default set currently installs 90 production-ready Skills. `docs-canvas` is
+The default set currently installs 109 production-ready Skills. `docs-canvas` is
 listed in `--list` but excluded because its upstream workflow is still a
 placeholder. To evaluate its host-specific fallback and bundled smoke artifact,
 select it explicitly with `--skill docs-canvas`; the installer prints an
@@ -106,6 +106,7 @@ Skill instructions and local resources can be converted, but Cursor-specific run
 - Skills that use MCP require the corresponding MCP server to be configured separately in Claude Code or Codex.
 - Skills that operate the Cursor SDK or Cursor Cloud Agents still require Cursor credentials and services.
 - Named Cursor subagents are not registered automatically. Their original definitions are bundled under `references/cursor-agents/` for use as prompts with an available general-purpose subagent.
+- pstack on Codex: every converted pstack Skill bundles `references/codex-adapter.md` (source: `scripts/adapters/pstack-codex.md`). It maps `Task` to `spawn_agent`/`wait_agent`/`close_agent`, `AskQuestion` to `request_user_input`, todo lists to `update_plan`, named subagents to registered `~/.codex/agents/<name>.toml` agents or a bundled-definition brief, and the current transcript to the `$CODEX_THREAD_ID` rollout file. Cursor Automations, `/loop`, and Cursor cloud agents are skipped with a one-line note instead of being reported as run.
 - `setup-pstack` writes a shared per-host Markdown file. The host does not load it as configuration; converted pstack Skills read it explicitly when invoked and use only model identifiers accepted by that host.
 
 Each converted Skill also starts with a compatibility note that prevents unavailable host capabilities from being reported as executed. See `skills/manifest.json` for per-Skill constraints.

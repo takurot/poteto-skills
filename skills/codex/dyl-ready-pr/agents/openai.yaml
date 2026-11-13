@@ -1,0 +1,5 @@
+interface:
+  display_name: "Dyl Ready Pr"
+  short_description: "Get a PR merge-ready for Dylan: deep /dyl-review till 🟢,..."
+policy:
+  allow_implicit_invocation: false
