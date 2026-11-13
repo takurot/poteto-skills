@@ -12,7 +12,7 @@ INSTALLER = ROOT / "install.sh"
 
 class InstallerSelectionTests(unittest.TestCase):
     def run_installer(self, *arguments: str) -> subprocess.CompletedProcess[str]:
-        with tempfile.TemporaryDirectory(prefix="potato-installer-test-") as project:
+        with tempfile.TemporaryDirectory(prefix="poteto-installer-test-") as project:
             return subprocess.run(
                 [
                     "bash",
@@ -55,10 +55,10 @@ class InstallerSelectionTests(unittest.TestCase):
         self.assertEqual(result.stdout.count("would install thermos "), 1)
 
     def test_rejects_unknown_skill(self) -> None:
-        result = self.run_installer("--skill", "not-a-potato-skill")
+        result = self.run_installer("--skill", "not-a-poteto-skill")
 
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("unknown skill: not-a-potato-skill", result.stderr)
+        self.assertIn("unknown skill: not-a-poteto-skill", result.stderr)
 
     def test_selects_one_valid_skill(self) -> None:
         result = self.run_installer("--skill", "thermos")
@@ -109,7 +109,7 @@ class InstallerExperimentalTests(unittest.TestCase):
 
     def test_default_real_install_excludes_experimental_skill(self) -> None:
         with tempfile.TemporaryDirectory(
-            prefix="potato-default-install-test-"
+            prefix="poteto-default-install-test-"
         ) as directory:
             project = Path(directory)
             result = self.run_project_install(project)
@@ -121,7 +121,7 @@ class InstallerExperimentalTests(unittest.TestCase):
 
     def test_explicit_real_install_includes_experimental_skill(self) -> None:
         with tempfile.TemporaryDirectory(
-            prefix="potato-explicit-install-test-"
+            prefix="poteto-explicit-install-test-"
         ) as directory:
             project = Path(directory)
             result = self.run_project_install(
@@ -138,7 +138,7 @@ class InstallerExperimentalTests(unittest.TestCase):
 class InstallerRollbackTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary_directory = tempfile.TemporaryDirectory(
-            prefix="potato-installer-rollback-test-"
+            prefix="poteto-installer-rollback-test-"
         )
         self.project = Path(self.temporary_directory.name) / "project with spaces"
         self.project.mkdir()
@@ -192,7 +192,7 @@ class InstallerRollbackTests(unittest.TestCase):
     def assert_no_staging_directories(self) -> None:
         if self.skills_root.exists():
             self.assertEqual(
-                list(self.skills_root.glob(".potato-skills.*")), []
+                list(self.skills_root.glob(".poteto-skills.*")), []
             )
 
     def test_claude_backup_is_outside_skill_discovery(self) -> None:

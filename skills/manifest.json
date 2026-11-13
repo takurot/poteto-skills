@@ -1054,7 +1054,7 @@
     }
   ],
   "files": {
-    "claude-code/.claude-plugin/plugin.json": "855fa12f4bf7881ae7938fb6af1af50d0945ae7a3dd662915dad72342e9ea2ac",
+    "claude-code/.claude-plugin/plugin.json": "ccf47c857f84041ac74864344247e4a77605a8d5b49f16a91a7c3c75d2c954c1",
     "claude-code/skills/add-dictation/LICENSE": "702f5f331b56aff0e33d8c7826df5202559f894145eb70355c6477b55b5bb8a0",
     "claude-code/skills/add-dictation/SKILL.md": "063921b8c8d76fe7eca2eb7aa1d8004427efdf3e3c492e99fa94862a6b336a6a",
     "claude-code/skills/add-read-aloud/LICENSE": "702f5f331b56aff0e33d8c7826df5202559f894145eb70355c6477b55b5bb8a0",
@@ -1286,7 +1286,7 @@
     "claude-code/skills/poteto-mode/scripts/watch-pr/types.compile.ts": "621af4c9a664fbf699a9737efccdc248abb416df8819c9dc5f824beae2b9b1d6",
     "claude-code/skills/poteto-mode/scripts/watch-pr/types.ts": "64ba6221e3bfe61bbb292337d199cdec6309455477280efb060203dba34e0e91",
     "claude-code/skills/poteto-mode/scripts/watch-pr/watch-pr": "d955603be6cc0e8b8ffcec722f635192b2261410b1f2929abea94480e47eb5d4",
-    "claude-code/skills/poteto-mode/scripts/worktree-audit.sh": "94e668af119a8c8978b205a437e3180252b717f824935d87bd2590be8daae3f2",
+    "claude-code/skills/poteto-mode/scripts/worktree-audit.sh": "b8a152bb5f04bdeed24b8330b32ff02e22bf62b743cc7138a79567106a0f85d3",
     "claude-code/skills/pr-review-canvas/LICENSE": "702f5f331b56aff0e33d8c7826df5202559f894145eb70355c6477b55b5bb8a0",
     "claude-code/skills/pr-review-canvas/SKILL.md": "43232059668365e45849c37ed974d1165b4ba1d852737cad965870563f8b6c75",
     "claude-code/skills/pr-review-canvas/renderer.js": "d78d36a46b0aeae755e2edd9b712970fd181183bb1c320d10caa8d9f776695c6",
@@ -1685,7 +1685,7 @@
     "codex/poteto-mode/scripts/watch-pr/types.compile.ts": "621af4c9a664fbf699a9737efccdc248abb416df8819c9dc5f824beae2b9b1d6",
     "codex/poteto-mode/scripts/watch-pr/types.ts": "64ba6221e3bfe61bbb292337d199cdec6309455477280efb060203dba34e0e91",
     "codex/poteto-mode/scripts/watch-pr/watch-pr": "d955603be6cc0e8b8ffcec722f635192b2261410b1f2929abea94480e47eb5d4",
-    "codex/poteto-mode/scripts/worktree-audit.sh": "94e668af119a8c8978b205a437e3180252b717f824935d87bd2590be8daae3f2",
+    "codex/poteto-mode/scripts/worktree-audit.sh": "b8a152bb5f04bdeed24b8330b32ff02e22bf62b743cc7138a79567106a0f85d3",
     "codex/pr-review-canvas/LICENSE": "702f5f331b56aff0e33d8c7826df5202559f894145eb70355c6477b55b5bb8a0",
     "codex/pr-review-canvas/SKILL.md": "0300884022ec4b8c97a6e99c8799d5269c21f94b3c9cda81a5e429c2708d0aaf",
     "codex/pr-review-canvas/agents/openai.yaml": "a861cf326c993cc229b5ac2207e7dceda44f12566c15ce0ac5c0ee243542a330",

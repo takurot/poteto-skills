@@ -1,4 +1,4 @@
-# potato-skills
+# poteto-skills
 
 [English](README.md)
 
@@ -22,8 +22,8 @@ Cursor 公式プラグイン集 [`cursor/plugins`](https://github.com/cursor/plu
 リポジトリを取得します。
 
 ```bash
-git clone https://github.com/takurot/potato-skills.git
-cd potato-skills
+git clone https://github.com/takurot/poteto-skills.git
+cd poteto-skills
 ```
 
 両方へユーザー単位でインストールします。

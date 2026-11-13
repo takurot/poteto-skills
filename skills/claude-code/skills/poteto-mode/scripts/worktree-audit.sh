@@ -24,7 +24,7 @@ gh pr list --author "@me" --state all --limit 1000 \
 
 # Optional, explicitly supplied transcript root for the active workspace only.
 # Leave unset when the host does not expose workspace transcripts.
-transcripts="${POTATO_TRANSCRIPTS_DIR:-}"
+transcripts="${POTETO_TRANSCRIPTS_DIR:-}"
 now=$(date +%s)
 
 printf "SIZE\tAGE\tMERGED\tDIRTY\tREMOTE\tPR\tLAST_CHAT\tBUCKET\tWORKTREE\n"

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate generated potato-skills checksums and both host inventories."""
+"""Validate generated poteto-skills checksums and both host inventories."""
 
 from __future__ import annotations
 

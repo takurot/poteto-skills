@@ -912,7 +912,7 @@ def adapt_support_text(text: str, target: str) -> str:
         'transcripts="$HOME/.cursor/projects/$slug/agent-transcripts"',
         "# Optional, explicitly supplied transcript root for the active workspace only.\n"
         "# Leave unset when the host does not expose workspace transcripts.\n"
-        'transcripts="${POTATO_TRANSCRIPTS_DIR:-}"',
+        'transcripts="${POTETO_TRANSCRIPTS_DIR:-}"',
     )
     return text
 
@@ -1176,10 +1176,10 @@ def build(source: Path, output: Path, force: bool = False) -> None:
         (claude_manifest_dir / "plugin.json").write_text(
             json.dumps(
                 {
-                    "name": "potato-skills",
+                    "name": "poteto-skills",
                     "version": "1.0.0",
                     "description": "Cursor plugin skills converted for Claude Code.",
-                    "author": {"name": "potato-skills contributors"},
+                    "author": {"name": "poteto-skills contributors"},
                 },
                 indent=2,
             )

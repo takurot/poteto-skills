@@ -59,7 +59,7 @@ class SupportResourceAdaptationTests(unittest.TestCase):
             )
             text = path.read_text()
             with self.subTest(target=target):
-                self.assertIn("POTATO_TRANSCRIPTS_DIR", text)
+                self.assertIn("POTETO_TRANSCRIPTS_DIR", text)
                 self.assertNotIn("$HOME/.cursor", text)
 
     def test_portable_playbooks_do_not_scan_cursor_project_transcripts(self) -> None:
