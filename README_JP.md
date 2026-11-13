@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-**最終更新:** 2026-11-14
+**最終更新:** 2026-11-13
 
 Cursor 公式プラグイン集 [`cursor/plugins`](https://github.com/cursor/plugins) の Skills を、Claude Code と Codex で読み込める形式に変換した配布リポジトリです。
 
@@ -89,6 +89,7 @@ Claude Code と Codex は Skill frontmatter の仕様が異なるため、配布
 | Skill 内の scripts/references/assets | 保持 | 保持 |
 | Cursor の専用 agent 定義 | `references/cursor-agents/` に同梱 | `references/cursor-agents/` に同梱 |
 | `.cursor/skills/` への参照 | `.claude/skills/` へ変換 | `.agents/skills/` または `~/.codex/skills/` へ変換 |
+| Skill フォルダの外を指す相対リンク(plugin の README、guide など) | 固定した upstream revision の permalink に書き換え | 固定した upstream revision の permalink に書き換え |
 
 名前は小文字 kebab-case に正規化します。frontmatterはPyYAMLで解析し、重複・未知fieldや
 不正な値を拒否して有効なYAMLを出力します。colonを含む未quoteのplain `description` という
