@@ -1,4 +1,4 @@
-# potato-skills
+# poteto-skills
 
 [日本語](README_JP.md)
 
@@ -21,8 +21,8 @@ Only Skills declared by each Cursor plugin's `plugin.json` are converted. Plugin
 Clone the repository:
 
 ```bash
-git clone https://github.com/takurot/potato-skills.git
-cd potato-skills
+git clone https://github.com/takurot/poteto-skills.git
+cd poteto-skills
 ```
 
 Install all Skills for both hosts at the user level:
