@@ -2,7 +2,7 @@
 
 [日本語](README_JP.md)
 
-**Last updated:** 2026-11-13
+**Last updated:** 2026-11-14
 
 A distribution of Skills from the official [`cursor/plugins`](https://github.com/cursor/plugins) collection, converted into formats that Claude Code and Codex can load.
 
@@ -106,7 +106,7 @@ Skill instructions and local resources can be converted, but Cursor-specific run
 - Skills that use MCP require the corresponding MCP server to be configured separately in Claude Code or Codex.
 - Skills that operate the Cursor SDK or Cursor Cloud Agents still require Cursor credentials and services.
 - Named Cursor subagents are not registered automatically. Their original definitions are bundled under `references/cursor-agents/` for use as prompts with an available general-purpose subagent.
-- pstack on Codex: every converted pstack Skill bundles `references/codex-adapter.md` (source: `scripts/adapters/pstack-codex.md`). It maps `Task` to `spawn_agent`/`wait_agent`/`close_agent`, `AskQuestion` to `request_user_input`, todo lists to `update_plan`, named subagents to registered `~/.codex/agents/<name>.toml` agents or a bundled-definition brief, and the current transcript to the `$CODEX_THREAD_ID` rollout file. Cursor Automations, `/loop`, and Cursor cloud agents are skipped with a one-line note instead of being reported as run.
+- pstack on Codex: every converted pstack Skill bundles `references/codex-adapter.md` (source: `scripts/adapters/pstack-codex.md`). It maps `Task` to `spawn_agent` (with `task_name`, and `fork_turns: "none"` for fresh-context workers) and `wait_agent`, `resume` to `followup_task`, `AskQuestion` to `request_user_input`, todo lists to `update_plan` when offered (else the reply), named subagents to a brief that embeds the bundled definition, and the current transcript to the `$CODEX_THREAD_ID` rollout file. Cursor Automations, `/loop`, and Cursor cloud agents are skipped with a one-line note instead of being reported as run. The tool names were checked against Codex CLI 0.169.0; the adapter tells the agent to follow the session's own tool schemas when they differ.
 - `setup-pstack` writes a shared per-host Markdown file. The host does not load it as configuration; converted pstack Skills read it explicitly when invoked and use only model identifiers accepted by that host.
 
 Each converted Skill also starts with a compatibility note that prevents unavailable host capabilities from being reported as executed. See `skills/manifest.json` for per-Skill constraints.
