@@ -13,7 +13,7 @@ MIT_LICENSE = (ROOT / "LICENSE").read_text(encoding="utf-8")
 class ConverterFixture(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary_directory = tempfile.TemporaryDirectory(
-            prefix="potato-converter-test-"
+            prefix="poteto-converter-test-"
         )
         self.root = Path(self.temporary_directory.name)
         self.source = self.root / "plugins"

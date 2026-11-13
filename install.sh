@@ -228,7 +228,7 @@ install_platform() {
       continue
     fi
 
-    TEMP_ROOT=$(mktemp -d "$destination_root/.potato-skills.XXXXXX")
+    TEMP_ROOT=$(mktemp -d "$destination_root/.poteto-skills.XXXXXX")
     staged="$TEMP_ROOT/$name"
     cp -R "$source_skill" "$staged"
     if path_exists "$destination"; then

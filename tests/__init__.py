@@ -1,1 +1,1 @@
-"""Regression tests for potato-skills."""
+"""Regression tests for poteto-skills."""

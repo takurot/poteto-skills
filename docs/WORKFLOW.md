@@ -1,7 +1,7 @@
-# potato-skills Development Workflow
+# poteto-skills Development Workflow
 
 **Last updated:** 2026-09-29
-**Applies to:** `takurot/potato-skills`
+**Applies to:** `takurot/poteto-skills`
 
 This document defines how to update the Cursor source snapshot, convert Skills for
 Claude Code and Codex, change the installer, and publish repository changes without
@@ -11,7 +11,7 @@ losing upstream attribution or claiming unsupported host behavior.
 
 Review these sources before making a change:
 
-1. [GitHub Issues](https://github.com/takurot/potato-skills/issues) for scope,
+1. [GitHub Issues](https://github.com/takurot/poteto-skills/issues) for scope,
    priority, dependencies, and acceptance criteria.
 2. [`README.md`](../README.md) for the public installation and compatibility
    contract.
@@ -38,7 +38,7 @@ Inspect the Issue and current repository state:
 
 ```bash
 gh issue view <ISSUE> \
-  --repo takurot/potato-skills \
+  --repo takurot/poteto-skills \
   --json number,title,body,comments,labels,state,url
 git status --short --branch
 git log -5 --oneline --decorate
@@ -241,8 +241,8 @@ Build twice from the same clean upstream revision into separate temporary
 directories and compare them:
 
 ```bash
-first_output=$(mktemp -d /tmp/potato-skills-first.XXXXXX)
-second_output=$(mktemp -d /tmp/potato-skills-second.XXXXXX)
+first_output=$(mktemp -d /tmp/poteto-skills-first.XXXXXX)
+second_output=$(mktemp -d /tmp/poteto-skills-second.XXXXXX)
 python3 scripts/build_skills.py --source ref/plugins --output "$first_output/generated"
 python3 scripts/build_skills.py --source ref/plugins --output "$second_output/generated"
 diff -qr "$first_output/generated" "$second_output/generated"
