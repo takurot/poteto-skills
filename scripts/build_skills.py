@@ -19,6 +19,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SOURCE = ROOT / "ref" / "plugins"
 DEFAULT_OUTPUT = ROOT / "skills"
+UPSTREAM_REPOSITORY = "https://github.com/cursor/plugins"
 ALLOWED_NAME = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 SUPPORTED_FRONTMATTER_FIELDS = {
     "name",
@@ -104,6 +105,7 @@ class SourceSkill:
     description: str
     explicit_only: bool
     source_file: Path
+    source_root: Path
     plugin_root: Path
     plugin_name: str
     plugin_version: str
@@ -297,6 +299,7 @@ def load_skills(source: Path) -> list[SourceSkill]:
                     explicit_value, "disable-model-invocation", skill_file
                 ),
                 source_file=skill_file,
+                source_root=source,
                 plugin_root=plugin_root,
                 plugin_name=manifest["name"],
                 plugin_version=manifest.get("version", "unknown"),
@@ -979,6 +982,43 @@ def copy_support_files(skill: SourceSkill, destination: Path, target: str) -> No
         shutil.copy2(PSTACK_CODEX_ADAPTER, adapter)
 
 
+MARKDOWN_RELATIVE_LINK = re.compile(r"\]\((\.{1,2}/[^)\s#]+)(#[^)\s]*)?\)")
+
+
+def externalize_links(skill: SourceSkill, destination: Path, revision: str | None) -> None:
+    """Point relative links that leave the Skill at the pinned upstream file.
+
+    Only the Skill folder is installed, so a link to plugin-level docs would
+    dangle. Links to the Skill's own files and to sibling Skills stay relative.
+    """
+    skill_source = skill.source_file.parent.resolve()
+    source_root = skill.source_root.resolve()
+    for file in sorted(destination.rglob("*.md")):
+        counterpart = skill_source / file.relative_to(destination)
+        if not counterpart.is_file():
+            continue
+        text = file.read_text(encoding="utf-8")
+
+        def pin(match: re.Match[str]) -> str:
+            link, fragment = match.group(1), match.group(2) or ""
+            target = (counterpart.parent / link).resolve()
+            if target.is_relative_to(skill_source) or target.is_relative_to(skill_source.parent):
+                return match.group(0)
+            if not target.exists() or not target.is_relative_to(source_root):
+                raise ValueError(f"{counterpart}: link target does not exist upstream: {link}")
+            if revision is None:
+                raise ValueError(
+                    f"{counterpart}: cannot pin link {link}: the source has no git revision"
+                )
+            kind = "tree" if target.is_dir() else "blob"
+            relative = target.relative_to(source_root).as_posix()
+            return f"]({UPSTREAM_REPOSITORY}/{kind}/{revision}/{relative}{fragment})"
+
+        pinned = MARKDOWN_RELATIVE_LINK.sub(pin, text)
+        if pinned != text:
+            file.write_text(pinned, encoding="utf-8")
+
+
 def short_description(description: str) -> str:
     plain = re.sub(r"[`*_#]", "", description).strip()
     if len(plain) > 64:
@@ -988,7 +1028,9 @@ def short_description(description: str) -> str:
     return plain[:64]
 
 
-def write_skill(skill: SourceSkill, target: str, destination: Path) -> None:
+def write_skill(
+    skill: SourceSkill, target: str, destination: Path, revision: str | None = None
+) -> None:
     destination.mkdir(parents=True)
     copy_support_files(skill, destination, target)
     description = skill.description
@@ -1019,6 +1061,7 @@ def write_skill(skill: SourceSkill, target: str, destination: Path) -> None:
     frontmatter.append("---")
     contents = "\n".join(frontmatter) + "\n\n" + adapt_body(skill, target)
     (destination / "SKILL.md").write_text(contents, encoding="utf-8")
+    externalize_links(skill, destination, revision)
 
     if target == "codex":
         agent_dir = destination / "agents"
@@ -1074,9 +1117,7 @@ def read_generated_manifest(output: Path) -> dict[str, object]:
         manifest = json.loads(manifest_file.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as error:
         raise ValueError(f"unrecognized generated output: {output}") from error
-    if not isinstance(manifest, dict) or manifest.get("source") != (
-        "https://github.com/cursor/plugins"
-    ):
+    if not isinstance(manifest, dict) or manifest.get("source") != UPSTREAM_REPOSITORY:
         raise ValueError(f"unrecognized generated output: {output}")
     return manifest
 
@@ -1177,6 +1218,7 @@ def build(source: Path, output: Path, force: bool = False) -> None:
     assert_safe_output(output, source, force)
     output.parent.mkdir(parents=True, exist_ok=True)
     skills = load_skills(source)
+    revision = source_revision(source)
     temporary = Path(tempfile.mkdtemp(prefix=f".{output.name}.", dir=output.parent))
     try:
         manifest_skills: list[dict[str, object]] = []
@@ -1185,7 +1227,7 @@ def build(source: Path, output: Path, force: bool = False) -> None:
                 destination_root = temporary / target
                 if target == "claude-code":
                     destination_root /= "skills"
-                write_skill(skill, target, destination_root / skill.name)
+                write_skill(skill, target, destination_root / skill.name, revision)
             manifest_skills.append(
                 {
                     "name": skill.name,
@@ -1219,8 +1261,8 @@ def build(source: Path, output: Path, force: bool = False) -> None:
         manifest = {
             "schema_version": 2,
             "generator": "scripts/build_skills.py",
-            "source": "https://github.com/cursor/plugins",
-            "source_revision": source_revision(source),
+            "source": UPSTREAM_REPOSITORY,
+            "source_revision": revision,
             "skill_count": len(skills),
             "skills": manifest_skills,
             "files": generated_file_hashes(temporary),

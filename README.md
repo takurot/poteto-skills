@@ -2,7 +2,7 @@
 
 [日本語](README_JP.md)
 
-**Last updated:** 2026-11-14
+**Last updated:** 2026-11-13
 
 A distribution of Skills from the official [`cursor/plugins`](https://github.com/cursor/plugins) collection, converted into formats that Claude Code and Codex can load.
 
@@ -90,6 +90,7 @@ Claude Code and Codex use different Skill frontmatter formats, so this repositor
 | Skill scripts, references, and assets | Preserved | Preserved |
 | Cursor-specific agent definitions | Bundled under `references/cursor-agents/` | Bundled under `references/cursor-agents/` |
 | References to `.cursor/skills/` | Converted to `.claude/skills/` | Converted to `.agents/skills/` or `~/.codex/skills/` |
+| Relative links that leave the Skill folder (plugin README, guides) | Rewritten to a permalink at the pinned upstream revision | Rewritten to a permalink at the pinned upstream revision |
 
 Names are normalized to lowercase kebab-case. The converter parses frontmatter with
 PyYAML, rejects duplicate or unknown fields and invalid values, and emits valid YAML.
