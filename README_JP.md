@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-**最終更新:** 2026-11-13
+**最終更新:** 2026-11-14
 
 Cursor 公式プラグイン集 [`cursor/plugins`](https://github.com/cursor/plugins) の Skills を、Claude Code と Codex で読み込める形式に変換した配布リポジトリです。
 
@@ -93,8 +93,30 @@ codex plugin add pstack@poteto-skills
 - plugin のバージョンは `<upstream のバージョン>+poteto.<内容のハッシュ>` なので、再生成で内容が変わると新しいバージョンとして入ります。
 - 同じ Skill を `install.sh` と plugin の両方でインストールしないでください。名前が重なり、plugin 側は名前空間付きになります。
 - `dyl-stack` は `pstack` plugin を前提にします(`setup-pstack` の隣から探します)。
-- フックは同梱しません。`ralph-loop`、`advisor`、`continual-learning` は手動の代替のままです。フック付き plugin は #25 で扱います。
+- 通常の 22 plugin にはフックを同梱しません。`ralph-loop`、`advisor`、`continual-learning` は手動の代替のままです。
 - 実験的な `docs-canvas` は含めません。名前付きの Cursor サブエージェントは登録しません。
+
+### 任意の Codex フックを有効にする
+
+Codex の `Stop` フックを使う場合は、別の `codex-hooks` plugin をインストールします。Python 3 が必要で、5 つの Skill のフック対応版を含みます。
+
+```bash
+codex plugin add codex-hooks@poteto-skills
+```
+
+この package は `.codex-plugin/plugin.json` だけを使います。Codex CLI 0.169.0 は、root の `plugin.json` が共存するとフックを検出しません。
+
+使用前に `/hooks` でスクリプトを確認し、信頼を設定してください。インストールだけでは信頼済みになりません。更新でスクリプトが変わった場合は再確認が必要です。フック付き plugin は公開 plugin directory の対象外です。
+
+`$codex-hooks:ralph-loop`、`$codex-hooks:advisor`、`$codex-hooks:continual-learning` で、現在のセッションの機能を有効にします。ループの中止は `$codex-hooks:cancel-ralph`、制限の確認は `$codex-hooks:ralph-loop-help` です。同じ Skill の手動版を `install.sh` や通常の plugin から重ねてインストールしないでください。
+
+- Ralph は保存したタスクを繰り返し、正確な完了 promise の出力か有限の反復上限で終了します。既定は初回を含む 10 回です。無制限のループは拒否します。
+- Advisor は Skill が設定する相談待ちと相談完了のマーカーを使います。相談待ちの作業に一度だけ通知し、再帰的な通知と質問への割り込みを抑止します。編集やサブエージェントの終了を自動検出しません。
+- Continual learning は通常のターンを数え、ターン数の閾値と前回の処理完了からの時間間隔を満たしたとき、ホストが公開した現在のセッションの transcript の処理を依頼します。既定は 10 ターンと 120 分です。初回はターン数の閾値だけで実行します。明示的な処理完了の確認後にだけ index を進めます。他のセッションを走査せず、transcript の文章を命令として扱いません。
+
+状態はプロジェクトの `.poteto-hooks/` にセッションごとに保存します。コミットしないでください。有効化にはホストの `CODEX_THREAD_ID` が必要です。Ralph、advisor、continual learning の順に優先します。後者 2 つはフックによる継続ターンでは通知しません。フックの信頼設定、plugin のインストール、機能の有効化は別の手順です。
+
+削除は `codex plugin remove codex-hooks@poteto-skills` です。実行用フックを削除しますが、プロジェクトの状態は確認用に残ります。
 
 ## 変換方針
 
@@ -119,7 +141,7 @@ dependency directoryを拒否します。MIT宣言と一致する変換元 `LICE
 
 Skill の文章やローカルスクリプトは移植できますが、Cursor 固有のランタイムそのものは同梱していません。
 
-- Cursor hooks に依存する自動反復や終了割り込みは、Claude Code/Codex では自動実行されません。Codex は plugin にフックを同梱できますが、別途の移植が必要です(#25)。
+- 通常の Claude Code と Codex のインストールでは Cursor フックの処理を手動で行います。任意の `codex-hooks` plugin は、上限付きの継続、advisor の通知、continual-learning の index 管理を Codex に移植します。フックの信頼設定と、セッションごとの明示的な有効化が必要です。
 - Cursor Canvas は、利用できない場合に通常の HTML 成果物へフォールバックする注記を追加しています。
 - MCP を使う Skills は、対応する MCP サーバーを Claude Code/Codex 側で別途設定する必要があります。
 - Cursor SDK や Cursor Cloud Agents を操作する Skill は、引き続き Cursor の認証情報とサービスを必要とします。

@@ -1,6 +1,6 @@
 # poteto-skills Development Workflow
 
-**Last updated:** 2026-11-13
+**Last updated:** 2026-11-14
 **Applies to:** `takurot/poteto-skills`
 
 This document defines how to update the Cursor source snapshot, convert Skills for
@@ -247,13 +247,37 @@ For the Codex plugins, also verify:
   byte-identical to `skills/codex/`;
 - the marketplace catalog matches `manifest.json` and every `source.path`
   exists inside the repository;
-- each plugin has both manifests, a `LICENSE`, and a version of the form
+- each ordinary plugin has both manifests, a `LICENSE`, and a version of the form
   `<upstream version>+poteto.<hash>` that changes when its content changes;
 - a clean, isolated Codex home can add the marketplace and install every plugin
   (`CODEX_HOME=<temp dir> codex plugin marketplace add <repo>`, then
   `codex plugin add <name>@poteto-skills`), and `codex debug prompt-input`
   lists the implicit Skills as `<plugin>:<skill>`. Never use the real
   `~/.codex` for this check.
+
+The separate `codex-hooks` plugin is an explicit exception to the default Skill
+byte-equality rule. Its five variants come from `scripts/codex_hooks/`, and its
+inventory identifies them as hook variants. Keep the 22 ordinary packages and
+both flat distributions unchanged when updating these variants. Include hook
+scripts, declarations, Skill text, and applicable upstream licenses in the
+generated checksums and plugin version. The marketplace lists the opt-in package
+alongside the ordinary plugins. The hook package deliberately ships only
+`.codex-plugin/plugin.json`. Codex CLI 0.169.0 ignores its hook declaration when
+a root `plugin.json` is also present, even if both manifests declare hooks.
+Verify hook discovery with `hooks/list` when changing this compatibility rule.
+
+For hook changes, add synthetic native `Stop` payload tests before implementation.
+Cover finite Ralph limits, exact promises, session separation, malformed state,
+`stop_hook_active`, advisor pending markers, and the distinction between a pending
+transcript and an acknowledged index. Then run the installed plugin in an isolated
+Codex home. Capture continuation and termination, advisor reminders, and continual
+index updates. Attach sanitized evidence to the PR. Do not describe a synthetic
+hook invocation as a live Codex continuation.
+
+Users must review plugin scripts in `/hooks`. A dedicated automated test may use
+`--dangerously-bypass-hook-trust` only after inspecting the generated scripts and
+isolating the test home so no unrelated hooks run. Record that trust was bypassed
+for that invocation. Never persist trust or test configuration in the real home.
 
 ### 6.3 Determinism
 

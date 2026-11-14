@@ -2,7 +2,7 @@
 
 [日本語](README_JP.md)
 
-**Last updated:** 2026-11-13
+**Last updated:** 2026-11-14
 
 A distribution of Skills from the official [`cursor/plugins`](https://github.com/cursor/plugins) collection, converted into formats that Claude Code and Codex can load.
 
@@ -94,8 +94,30 @@ codex plugin add pstack@poteto-skills
 - A plugin's version is `<upstream version>+poteto.<content hash>`, so any regenerated content installs as a new version.
 - Do not install the same Skill with both `install.sh` and a plugin. The two copies share names and the plugin one is namespaced.
 - `dyl-stack` expects the `pstack` plugin, which it finds beside `setup-pstack`.
-- Hooks are not bundled. `ralph-loop`, `advisor`, and `continual-learning` keep their manual fallbacks. Hook-enabled plugins are tracked in #25.
+- These 22 plugins have no hooks. `ralph-loop`, `advisor`, and `continual-learning` keep their manual fallbacks.
 - The experimental `docs-canvas` Skill is not packaged. Named Cursor subagents are not registered.
+
+### Enable optional Codex hooks
+
+Install the separate `codex-hooks` plugin for native Codex `Stop` hooks. It requires Python 3 and includes five Skill variants.
+
+```bash
+codex plugin add codex-hooks@poteto-skills
+```
+
+This package uses only `.codex-plugin/plugin.json`. Codex CLI 0.169.0 does not discover its hooks when a root `plugin.json` is also present.
+
+Review and trust its scripts in `/hooks` before use. Installation alone does not activate trusted hooks. Review changed scripts again after an update. Plugins with hooks are not eligible for the public plugin directory.
+
+Invoke `$codex-hooks:ralph-loop`, `$codex-hooks:advisor`, or `$codex-hooks:continual-learning` to enable the corresponding feature for the current session. Use `$codex-hooks:cancel-ralph` to cancel a loop and `$codex-hooks:ralph-loop-help` for its limits. Avoid installing the matching manual Skills through `install.sh` or their ordinary plugins alongside these variants.
+
+- Ralph repeats the saved task until its exact completion promise appears or its finite iteration limit is reached. The default is 10 attempts, including the first. Unlimited loops are rejected.
+- Advisor uses explicit pending and successful-consult markers from its Skill. It sends one reminder for pending work and suppresses recursive reminders and questions. It does not automatically detect edits or subagent completion.
+- Continual learning counts ordinary turns and requests processing of the current session's host-exposed transcript after its turn threshold and the interval since the last acknowledged review pass. Defaults are 10 turns and 120 minutes. The first review requires only the turn threshold. Its index advances only after explicit acknowledgement. It does not scan other sessions or treat transcript text as instructions.
+
+State stays under the project's `.poteto-hooks/`, separated by session identity. Do not commit that state. Activation requires the host's `CODEX_THREAD_ID`. Ralph has priority over advisor, followed by continual learning. The latter two do not issue reminders on hook-generated continuations. Hook trust, plugin installation, and feature activation are separate steps.
+
+Remove the plugin with `codex plugin remove codex-hooks@poteto-skills`. This removes its executable hooks, while project state remains available for inspection.
 
 ## Conversion policy
 
@@ -121,7 +143,7 @@ directories. A declared MIT license and a matching upstream `LICENSE` file are r
 
 Skill instructions and local resources can be converted, but Cursor-specific runtime capabilities are not bundled.
 
-- Automated repetition and stop interception that depend on Cursor hooks do not run automatically in Claude Code or Codex. Codex can bundle plugin hooks, which needs a separate port (#25).
+- Ordinary Claude Code and Codex installs use manual fallbacks for Cursor hook workflows. The optional `codex-hooks` plugin ports bounded continuation, advisor reminders, and continual-learning indexing to Codex. It requires hook trust review and explicit session activation.
 - Skills that use Cursor Canvas include a fallback to a standalone HTML artifact when Canvas is unavailable.
 - Skills that use MCP require the corresponding MCP server to be configured separately in Claude Code or Codex.
 - Skills that operate the Cursor SDK or Cursor Cloud Agents still require Cursor credentials and services.

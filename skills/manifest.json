@@ -1531,6 +1531,19 @@
       "skills": [
         "x-money-guide"
       ]
+    },
+    {
+      "name": "codex-hooks",
+      "variant": "hooks",
+      "version": "1.0.0+poteto.a1ae961",
+      "category": "Developer Tools",
+      "skills": [
+        "advisor",
+        "cancel-ralph",
+        "continual-learning",
+        "ralph-loop",
+        "ralph-loop-help"
+      ]
     }
   ],
   "files": {
@@ -3345,6 +3358,29 @@
     "codex-plugins/cli-for-agent/skills/cli-for-agents/LICENSE": "702f5f331b56aff0e33d8c7826df5202559f894145eb70355c6477b55b5bb8a0",
     "codex-plugins/cli-for-agent/skills/cli-for-agents/SKILL.md": "9053d925566400ec3a44ea1914188ac423baf9c4cf8e0013363d1765d84d7680",
     "codex-plugins/cli-for-agent/skills/cli-for-agents/agents/openai.yaml": "e21f3e0d67d5456f5beb0d5303078310789bcc408ab6cbaeba14e5c2abdfaada",
+    "codex-plugins/codex-hooks/.codex-plugin/plugin.json": "4340915e2390063e9499721ebbfe9724423a6d75cee80301c614df0e494feaa5",
+    "codex-plugins/codex-hooks/LICENSE": "ef5097ba1d3e7536145a2858e6e8dc3f54812f3eaa8032d3acfbeca19d0516b0",
+    "codex-plugins/codex-hooks/hooks/hooks.json": "be9d3ae6bc6b4ba8889c86f353cb7a9d60935aed64a21d571920715d39bd71eb",
+    "codex-plugins/codex-hooks/licenses/advisor.txt": "702f5f331b56aff0e33d8c7826df5202559f894145eb70355c6477b55b5bb8a0",
+    "codex-plugins/codex-hooks/licenses/continual-learning.txt": "702f5f331b56aff0e33d8c7826df5202559f894145eb70355c6477b55b5bb8a0",
+    "codex-plugins/codex-hooks/licenses/ralph-loop.txt": "702f5f331b56aff0e33d8c7826df5202559f894145eb70355c6477b55b5bb8a0",
+    "codex-plugins/codex-hooks/metadata.json": "992d8b544eec187b794f6e1331fc9881c6677af05172e37bb2c6776bceb92469",
+    "codex-plugins/codex-hooks/scripts/runtime.py": "52c24c8f47e6415a34d35817396831d9bdc00f6778e7156eb3ada8254207afa3",
+    "codex-plugins/codex-hooks/skills/advisor/LICENSE": "702f5f331b56aff0e33d8c7826df5202559f894145eb70355c6477b55b5bb8a0",
+    "codex-plugins/codex-hooks/skills/advisor/SKILL.md": "ddf01eb97255a7a74c9a908f03e7f910414e4c635cee3663c61c5acd6902f778",
+    "codex-plugins/codex-hooks/skills/advisor/agents/openai.yaml": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94",
+    "codex-plugins/codex-hooks/skills/cancel-ralph/LICENSE": "702f5f331b56aff0e33d8c7826df5202559f894145eb70355c6477b55b5bb8a0",
+    "codex-plugins/codex-hooks/skills/cancel-ralph/SKILL.md": "9fb0d3febca891d8957d3917776c64d4f3d27c4ec89aa92ffd02b221927890f7",
+    "codex-plugins/codex-hooks/skills/cancel-ralph/agents/openai.yaml": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94",
+    "codex-plugins/codex-hooks/skills/continual-learning/LICENSE": "702f5f331b56aff0e33d8c7826df5202559f894145eb70355c6477b55b5bb8a0",
+    "codex-plugins/codex-hooks/skills/continual-learning/SKILL.md": "c712ad6ed3025abbe5d6de261eb56cc1c2bdb3986c4bd0aee56e750781fadb66",
+    "codex-plugins/codex-hooks/skills/continual-learning/agents/openai.yaml": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94",
+    "codex-plugins/codex-hooks/skills/ralph-loop/LICENSE": "702f5f331b56aff0e33d8c7826df5202559f894145eb70355c6477b55b5bb8a0",
+    "codex-plugins/codex-hooks/skills/ralph-loop/SKILL.md": "ffd5b59100a0725b31f1cb7a947dab4afdd1bad4738163626e2ddc977b434b48",
+    "codex-plugins/codex-hooks/skills/ralph-loop/agents/openai.yaml": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94",
+    "codex-plugins/codex-hooks/skills/ralph-loop-help/LICENSE": "702f5f331b56aff0e33d8c7826df5202559f894145eb70355c6477b55b5bb8a0",
+    "codex-plugins/codex-hooks/skills/ralph-loop-help/SKILL.md": "53c442a83e37f846f575d6d6d5666c2f1fceaa95bc4c7bbaca70861dd4ac9076",
+    "codex-plugins/codex-hooks/skills/ralph-loop-help/agents/openai.yaml": "a1499d95abd8447558c535fe5554adcc3c9b988a0a39264a6283d430effe1e94",
     "codex-plugins/continual-learning/.codex-plugin/plugin.json": "d083481b52a3a0086069e52a3019d73419c59f5caec446d0c920b26b421bbbdb",
     "codex-plugins/continual-learning/LICENSE": "702f5f331b56aff0e33d8c7826df5202559f894145eb70355c6477b55b5bb8a0",
     "codex-plugins/continual-learning/plugin.json": "1a8bb284297391a6d80fe6f092dff348e2f5498f4207687bf4c6625167a294b7",

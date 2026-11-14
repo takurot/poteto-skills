@@ -30,6 +30,7 @@ class PluginSkill(Protocol):
     name: str
     plugin_name: str
     plugin_root: Path
+    plugin_version: str
     license_file: Path
 
 
@@ -212,17 +213,183 @@ def verify_plugins(output: Path, entries: object) -> None:
         if not isinstance(entry, dict) or not isinstance(entry.get("name"), str):
             raise ValueError(f"{output}: invalid Codex plugin entry")
         name = entry["name"]
+        if not re.fullmatch(r"[a-z0-9][a-z0-9-]*", name):
+            raise ValueError(f"{output}: unsafe Codex plugin name")
         root = output / PLUGIN_DIRECTORY / name
-        required = (root / "plugin.json", root / ".codex-plugin" / "plugin.json", root / "LICENSE")
-        if not all(path.is_file() for path in required):
+        variant = entry.get("variant", "default")
+        if variant not in ("default", "hooks"):
+            raise ValueError(f"{root}: unsupported plugin variant")
+        manifests_to_check = [root / ".codex-plugin" / "plugin.json"]
+        if variant == "default":
+            manifests_to_check.insert(0, root / "plugin.json")
+        if not all(path.is_file() for path in [*manifests_to_check, root / "LICENSE"]):
             raise ValueError(f"{output}: incomplete Codex plugin {name}")
-        for manifest in required[:2]:
+        for manifest in manifests_to_check:
             document = json.loads(manifest.read_text(encoding="utf-8"))
             if document.get("name") != name or document.get("version") != entry.get("version"):
                 raise ValueError(f"{manifest}: does not match the plugin inventory")
         shipped = sorted(p.name for p in (root / "skills").iterdir())
         if shipped != sorted(entry["skills"]):
             raise ValueError(f"{root}: skill set differs from the plugin inventory")
+        if variant == "hooks":
+            verify_hook_plugin(root, entry, output)
+            continue
         for skill in shipped:
-            if directory_files(root / "skills" / skill) != directory_files(output / "codex" / skill):
-                raise ValueError(f"{root}: skill {skill} differs from the Codex distribution")
+            if directory_files(root / "skills" / skill) != directory_files(
+                output / "codex" / skill
+            ):
+                raise ValueError(
+                    f"{root}: skill {skill} differs from the Codex distribution"
+                )
+
+
+HOOK_SKILLS = {
+    "ralph-loop": "ralph-loop",
+    "cancel-ralph": "ralph-loop",
+    "ralph-loop-help": "ralph-loop",
+    "advisor": "advisor",
+    "continual-learning": "continual-learning",
+}
+HOOK_SOURCE = Path(__file__).parent / "codex_hooks"
+HOOK_COMMAND = 'python3 "${PLUGIN_ROOT}/scripts/runtime.py" stop'
+HOOK_CONTENT_PATHS = (
+    "skills",
+    "scripts",
+    "hooks",
+    "licenses",
+    "LICENSE",
+    "metadata.json",
+)
+HOOK_UPSTREAM = {
+    "version": "1.0.0",
+    "displayName": "Codex Hooks (opt-in)",
+    "description": "Opt-in finite Ralph loops, advisor nudges, and session preference checkpoints for Codex.",
+    "author": {"name": FALLBACK_AUTHOR},
+}
+
+
+def hook_metadata(repository: str, provenance: dict[str, str]) -> dict:
+    plan = PluginPlan(
+        "codex-hooks", HOOK_UPSTREAM, tuple(sorted(HOOK_SKILLS)), Path("LICENSE")
+    )
+    _, compat = manifests(plan, "1.0.0", repository)
+    compat["hooks"] = "./hooks/hooks.json"
+    return {"compat": compat, "upstream_plugins": provenance}
+
+
+def write_hook_plugin(
+    skills: Iterable[PluginSkill], destination: Path, repository: str
+) -> list[dict[str, object]]:
+    selected = {skill.name: skill for skill in skills if skill.name in HOOK_SKILLS}
+    if set(selected) != set(HOOK_SKILLS):
+        return []
+    if any(skill.plugin_name != HOOK_SKILLS[name] for name, skill in selected.items()):
+        raise ValueError("hook Skills must come from their declared upstream plugins")
+    root = destination / "codex-hooks"
+    shutil.copytree(HOOK_SOURCE / "skills", root / "skills")
+    (root / "scripts").mkdir()
+    shutil.copy2(HOOK_SOURCE / "runtime.py", root / "scripts/runtime.py")
+    shutil.copy2(Path(__file__).resolve().parents[1] / "LICENSE", root / "LICENSE")
+    for upstream_name in sorted(set(HOOK_SKILLS.values())):
+        member = next(
+            skill for skill in selected.values() if skill.plugin_name == upstream_name
+        )
+        target = root / "licenses" / (upstream_name + ".txt")
+        target.parent.mkdir(exist_ok=True)
+        shutil.copy2(member.license_file, target)
+        for name, origin in HOOK_SKILLS.items():
+            if origin == upstream_name:
+                shutil.copy2(member.license_file, root / "skills" / name / "LICENSE")
+    write_json(
+        root / "hooks/hooks.json",
+        {
+            "hooks": {
+                "Stop": [{"hooks": [{"type": "command", "command": HOOK_COMMAND}]}]
+            }
+        },
+    )
+    provenance = {
+        member.plugin_name: member.plugin_version for member in selected.values()
+    }
+    metadata = hook_metadata(repository, provenance)
+    compat = metadata["compat"].copy()
+    write_json(root / "metadata.json", metadata)
+    digest = tree_digest([root / p for p in HOOK_CONTENT_PATHS], root)
+    version = plugin_version(HOOK_UPSTREAM, digest)
+    compat["version"] = version
+    write_json(root / ".codex-plugin/plugin.json", compat)
+    return [
+        {
+            "name": "codex-hooks",
+            "variant": "hooks",
+            "version": version,
+            "category": compat["interface"]["category"],
+            "skills": sorted(HOOK_SKILLS),
+        }
+    ]
+
+
+def verify_hook_plugin(root: Path, entry: dict[str, object], output: Path) -> None:
+    if entry.get("name") != "codex-hooks" or entry.get("skills") != sorted(HOOK_SKILLS):
+        raise ValueError("unsupported hook plugin inventory")
+    for name, upstream in HOOK_SKILLS.items():
+        actual = directory_files(root / "skills" / name)
+        expected = directory_files(HOOK_SOURCE / "skills" / name)
+        expected["LICENSE"] = (
+            output / PLUGIN_DIRECTORY / upstream / "LICENSE"
+        ).read_bytes()
+        if actual != expected:
+            raise ValueError(f"{root}: unrecognized hook Skill variant {name}")
+    if (root / "scripts/runtime.py").read_bytes() != (
+        HOOK_SOURCE / "runtime.py"
+    ).read_bytes():
+        raise ValueError(f"{root}: hook runtime differs from source")
+    hooks = json.loads((root / "hooks/hooks.json").read_text())
+    if hooks != {
+        "hooks": {"Stop": [{"hooks": [{"type": "command", "command": HOOK_COMMAND}]}]}
+    }:
+        raise ValueError(f"{root}: undeclared hooks")
+    for upstream in set(HOOK_SKILLS.values()):
+        if (root / "licenses" / (upstream + ".txt")).read_bytes() != (
+            output / PLUGIN_DIRECTORY / upstream / "LICENSE"
+        ).read_bytes():
+            raise ValueError(f"{root}: missing or changed upstream license")
+    metadata = json.loads((root / "metadata.json").read_text())
+    manifest = json.loads((output / "manifest.json").read_text())
+    provenance = {
+        skill["plugin"]: skill["plugin_version"]
+        for skill in manifest["skills"]
+        if skill["plugin"] in set(HOOK_SKILLS.values())
+    }
+    if metadata != hook_metadata(manifest["source"], provenance):
+        raise ValueError(f"{root}: unrecognized hook metadata")
+    if (root / "LICENSE").read_bytes() != (
+        Path(__file__).resolve().parents[1] / "LICENSE"
+    ).read_bytes():
+        raise ValueError(f"{root}: changed adapter license")
+    expected_files = {
+        ".codex-plugin/plugin.json",
+        "LICENSE",
+        "metadata.json",
+        "hooks/hooks.json",
+        "scripts/runtime.py",
+    }
+    expected_files.update(
+        "licenses/" + name + ".txt" for name in set(HOOK_SKILLS.values())
+    )
+    for name in HOOK_SKILLS:
+        expected_files.update(
+            "skills/" + name + "/" + path
+            for path in directory_files(HOOK_SOURCE / "skills" / name)
+        )
+        expected_files.add("skills/" + name + "/LICENSE")
+    if set(directory_files(root)) != expected_files:
+        raise ValueError(f"{root}: undeclared hook resources")
+    digest = tree_digest([root / p for p in HOOK_CONTENT_PATHS], root)
+    version = plugin_version({"version": "1.0.0"}, digest)
+    if version != entry.get("version"):
+        raise ValueError(f"{root}: hook version does not match resources")
+    for relative, key in [(".codex-plugin/plugin.json", "compat")]:
+        expected = {**metadata[key], "version": version}
+        if json.loads((root / relative).read_text()) != expected:
+            raise ValueError(f"{root}: hook metadata differs from manifest")

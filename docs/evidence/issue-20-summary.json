@@ -1,0 +1,31 @@
+{
+  "revision": "95207f4b40aee1e8896392b9638f9f128a0b4182",
+  "cli": "0.169.0",
+  "marketplace_add_exit": 0,
+  "plugins_installed": 22,
+  "implicit_skills_expected": 42,
+  "implicit_skills_discovered": 42,
+  "explicit_only_skills": 67,
+  "live_ephemeral_exit": 0,
+  "live_traced_exit": 0,
+  "spawn_count": 1,
+  "spawn_keys": [
+    [
+      "task_name",
+      "fork_turns",
+      "message"
+    ]
+  ],
+  "model_override_omitted": true,
+  "wait_completed": true,
+  "todo_fallback": "update_plan unavailable; verbatim Investigation checklist in agent reply",
+  "model_file_absent": true,
+  "real_auth_symlink_removed": true,
+  "limitations": [
+    "Explicit skill main-prompt injection exceeded limit and was truncated; full installed SKILL.md then read directly.",
+    "Both collab and multi_agent feature aliases emitted deprecation warnings; second used multi_agent.",
+    "Read-only macOS sandbox denied git xcrun cache writes; git commands still exited 0 and showed unchanged status.",
+    "Worker brief payload is host encrypted in rollout; exact instruction contents cannot be independently inspected there. Agent reports bundled instructions/path included.",
+    "Bounded run skipped how multi-agent fanout per exactly-one request. No hooks, Cursor services, named-agent control, or close_agent were claimed."
+  ]
+}

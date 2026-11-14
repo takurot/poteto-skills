@@ -1,0 +1,22 @@
+{
+  "name": "codex-hooks",
+  "version": "1.0.0+poteto.a1ae961",
+  "description": "Opt-in finite Ralph loops, advisor nudges, and session preference checkpoints for Codex.",
+  "author": {
+    "name": "poteto-skills contributors"
+  },
+  "homepage": "https://github.com/cursor/plugins",
+  "repository": "https://github.com/cursor/plugins",
+  "license": "MIT",
+  "keywords": [],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Codex Hooks (opt-in)",
+    "shortDescription": "Opt-in finite Ralph loops, advisor nudges, and session preference checkpoints for Codex.",
+    "longDescription": "Opt-in finite Ralph loops, advisor nudges, and session preference checkpoints for Codex.",
+    "developerName": "poteto-skills contributors",
+    "category": "Developer Tools",
+    "websiteURL": "https://github.com/cursor/plugins"
+  },
+  "hooks": "./hooks/hooks.json"
+}

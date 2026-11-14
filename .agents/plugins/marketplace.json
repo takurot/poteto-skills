@@ -267,6 +267,18 @@
         "authentication": "ON_INSTALL"
       },
       "category": "Integrations"
+    },
+    {
+      "name": "codex-hooks",
+      "source": {
+        "source": "local",
+        "path": "./skills/codex-plugins/codex-hooks"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
     }
   ]
 }

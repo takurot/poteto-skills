@@ -1,0 +1,39 @@
+{
+  "cli": "0.169.0",
+  "plugin_version": "1.0.0+poteto.a1ae961",
+  "source_revision": "6e359ce0aba9e927914d8a940510aa2ef66a8f23",
+  "sandbox": "workspace-write",
+  "hook_trust": "bypassed for these isolated, inspected-script invocations only",
+  "cases": [
+    {
+      "case": "ralph-limit",
+      "native_hook_continuations": 2,
+      "exit_code": 0,
+      "project_agents_unchanged": true
+    },
+    {
+      "case": "ralph-promise",
+      "native_hook_continuations": 1,
+      "exit_code": 0,
+      "project_agents_unchanged": true
+    },
+    {
+      "case": "advisor",
+      "native_hook_continuations": 1,
+      "exit_code": 0,
+      "project_agents_unchanged": true
+    },
+    {
+      "case": "learning",
+      "native_hook_continuations": 1,
+      "exit_code": 0,
+      "project_agents_unchanged": true
+    },
+    {
+      "case": "skill-activation",
+      "native_hook_continuations": 1,
+      "exit_code": 0,
+      "project_agents_unchanged": true
+    }
+  ]
+}
