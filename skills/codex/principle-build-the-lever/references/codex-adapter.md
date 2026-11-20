@@ -17,6 +17,8 @@ Codex has no stop hooks in a plain Skill install, so keep the autonomy inside th
 | Run another pstack skill (`/name` or "the **name** skill") | Read `<skills>/<name>/SKILL.md` and follow it. When you tell the user to type it, write `$<name>`, or `$<plugin>:<name>` when this Skill came from a plugin, as its name in the Skill list shows. |
 | `Grep`, `Glob` | Shell `rg` and `rg --files`. |
 
+When a pstack kickoff calls for `worker.md`, point the subagent's `message` to the absolute path of `poteto-mode/worker.md` in the installed Skill root. Use a separate worktree when a Project worker needs its own checkout.
+
 ## Subagent fields
 
 | Cursor | Codex |
@@ -48,7 +50,7 @@ Follow its steps with these changes:
 - Detect. The detected models are the overrides, each with its efforts, that the `spawn_agent` description lists. If it lists none, ask the user to name identifiers they know work, or use `inherit-parent`. Never write an identifier you did not confirm.
 - Defaults. Map each default slug with the Models rows. A slug the host does not list becomes `inherit-parent`.
 - Budget. Treat the budget as a target for `reasoning_effort`, not as text inside a model name. Choose only identifiers and efforts the host lists.
-- Write. Write `~/.codex/pstack-models.md` as plain Markdown with no frontmatter, then the comment lines, the `# budget` line, and one line per role from step 5. Overwrite the whole file. Say that Codex does not load it and that pstack skills read it when invoked. Do not put the role lines in `AGENTS.md`.
+- Write. Write `~/.codex/pstack-models.md` as plain Markdown with no frontmatter. Keep `# defaults: 3`, the `# budget` line, and one line per role from step 5. Overwrite the whole file. Say that Codex does not load it and that pstack skills read it when invoked. Do not put the role lines in `AGENTS.md`.
 
 ## Paths
 

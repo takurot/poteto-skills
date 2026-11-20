@@ -3,7 +3,7 @@ name: setup-pstack
 description: "Configure which models pstack uses per role and at what reasoning budget. Detects your available models and writes a shared file that converted pstack Skills read explicitly. Use for /setup-pstack, \"configure pstack models\", \"pstack budget\", or changing pstack's model choices."
 ---
 
-> Claude Code compatibility: converted from Cursor plugin `pstack` v0.15.36.
+> Claude Code compatibility: converted from Cursor plugin `pstack` v0.15.46.
 > Use the host's equivalent tool or subagent interface when the text names a Cursor-specific control.
 > Never claim that an unavailable hook, MCP server, named agent, or Cursor service ran.
 
@@ -19,49 +19,41 @@ Use the current host's subagent interface or its validation error to obtain mode
 
 ### 2. Load current state
 
-The default role-to-model mapping is the rule shape shown in step 5 below. If `~/.claude/pstack-models.md` already exists, read it and treat its `# budget` line and its role values as the current choices. Otherwise start from those defaults. A line whose role is not in step 5, such as `how critics`, is from a retired role. Drop it.
+If `~/.claude/pstack-models.md` exists, read its budget and role values. Keep choices for roles listed in step 5, including `inherit-parent` and `auto`. Flag any model identifier that the current host does not accept for review in step 3. Drop retired roles and report them. Use the step 5 defaults for new or unset roles.
 
 ### 3. Budget, map, and confirm
 
-**(a) Ask for a budget.** Prefer AskQuestion over free text. Offer these four options with these exact labels, and name the current budget when the rule records one. With no rule, say that `large` matches the skill defaults.
+**(a) Ask for a budget.** Prefer AskQuestion over free text. Offer these three options with these exact labels, and name the current budget when the rule records one. With no rule, say that `large` matches the skill defaults.
 
-- `unlimited — max reasoning`
 - `large — xhigh reasoning`
 - `medium — high reasoning`
 - `small — medium reasoning`
 
 **(b) Apply it.** Treat the budget as a selection preference, not as syntax inside a model name. Choose only exact identifiers accepted by the current host. If the host exposes reasoning effort separately, set it through that interface. If it exposes distinct model identifiers for effort tiers, choose only an identifier present in the accepted set. Do not construct a model identifier by editing a suffix. When no accepted identifier satisfies the requested budget, mark the role as needing a choice or use `inherit-parent` after confirmation.
 
-**(c) Show the roles and confirm.** Show every role with its model, marking any real slug not in the detected set as needing a choice. Also list each line step 2 dropped. Ask whether to accept as-is or change specific roles, offering the detected models plus `inherit-parent` and `auto` (both mean: this role runs on the parent chat model, which is how Auto users stay on Auto) as the options. Prefer AskQuestion over free text. For panel roles (arena runners, architect runners, interrogate reviewers) the value is a list, and one subagent runs per entry, alias entries included, so the list length sets the count. `arena cross-judge pool` is also a list, but Arena runs one judge. It tries only values from a family other than the parent's, in list order, so order it by preference. An `inherit-parent` or `auto` value never judges. `swarm workers` is the default model for every worker unless a race or comparison assigns another model per arm.
+**(c) Show the roles and confirm.** Show every role with its model, marking any real slug not in the detected set as needing a choice. Also list each line step 2 dropped. Ask whether to accept as-is or change specific roles, offering the detected models at `xhigh` or below plus `inherit-parent` and `auto` (both mean: this role runs on the parent chat model, which is how Auto users stay on Auto) as the options. Prefer AskQuestion over free text. For panel roles (arena runners, interrogate reviewers) the value is a list, and one subagent runs per entry, alias entries included, so the list length sets the count. `arena cross-judge pool` is also a list, but Arena runs one judge. It tries only values from a vendor other than the parent's, in list order, so order it by preference. Fable and the other Claude models are one vendor. An `inherit-parent` or `auto` value never judges. `swarm workers` is the default model for every worker unless a race or comparison assigns another model per arm.
 
 ### 4. Validate
 
-Every real slug written must be in the detected set. `inherit-parent` and `auto` always pass. If a chosen real slug is not available, stop and ask again.
+Every real slug written must be in the detected set and at `xhigh` or below. `inherit-parent` and `auto` always pass. If a chosen real slug is not available, stop and ask again.
 
 ### 5. Write the rule
 
-Write `~/.claude/pstack-models.md` as plain Markdown with a `# budget` comment and one line per role. This file is not host configuration; converted pstack consumers read it explicitly. Overwrite the whole file so re-runs stay idempotent. Use only exact identifiers accepted by the current host. Shape:
+Write `~/.claude/pstack-models.md` as plain Markdown with the `# defaults: 3` and `# budget` comments and one line per role. Converted pstack consumers read this file explicitly. Overwrite the whole file so re-runs stay idempotent. Use only exact identifiers accepted by the current host. Shape:
 
 ```
 # pstack model configuration. Consumers read this file explicitly.
 # `inherit-parent` or `auto` means: omit the subagent model parameter.
+# defaults: 3
 # budget: medium (host-controlled)
 feature, refactoring: inherit-parent
 bug-fix: inherit-parent
 perf-issue: inherit-parent
 hillclimb: inherit-parent
 judgment and prose: inherit-parent
-hardest tasks: inherit-parent
-how explorer: inherit-parent
-how explainer: inherit-parent
-why investigators: inherit-parent
-why synthesizer: inherit-parent
-reflect tooling: inherit-parent
-reflect judgment, divergent, synthesizer: inherit-parent
 arena runners: inherit-parent
 arena cross-judge pool: inherit-parent
 swarm workers: inherit-parent
-architect runners: inherit-parent
 interrogate reviewers: inherit-parent
 ```
 

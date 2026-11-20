@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-**最終更新:** 2026-11-14
+**最終更新:** 2026-11-20
 
 Cursor 公式プラグイン集 [`cursor/plugins`](https://github.com/cursor/plugins) の Skills を、Claude Code と Codex で読み込める形式に変換した配布リポジトリです。
 
@@ -17,6 +17,8 @@ Cursor 公式プラグイン集 [`cursor/plugins`](https://github.com/cursor/plu
 
 変換対象は各 Cursor プラグインの `plugin.json` が `skills` として宣言したものだけです。MCP 設定しか持たないプラグインは Skills ではないため変換しません。重複する2組は、付属ファイルが充実した版または本来のプラグイン側の版に統合しています。
 現在の参照 revision からは、各ホスト向けに110個の Skills を生成します。
+
+両ホスト向けの配布物には pstack 0.15.46 が含まれます。[固定した upstream ソース](https://github.com/cursor/plugins/tree/fbb86c09bbb4a25e490aaed136899ced1e9140e4/pstack)を参照してください。
 
 ## インストール
 

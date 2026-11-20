@@ -539,15 +539,11 @@ def adapt_pr_review_canvas(skill_name: str, body: str) -> str:
 
 
 PSTACK_CONFIG_CONSUMERS = {
-    "architect",
     "arena",
-    "how",
     "interrogate",
     "poteto-help",
     "poteto-mode",
-    "reflect",
     "swarm",
-    "why",
 }
 
 PSTACK_PLUGIN = "pstack"
@@ -560,6 +556,7 @@ PSTACK_SHAPE_PATTERN = re.compile(
 PSTACK_SAFE_COMMENTS = (
     "# pstack model configuration. Consumers read this file explicitly.",
     "# `inherit-parent` or `auto` means: omit the subagent model parameter.",
+    "# defaults: 3",
     "# budget: medium (host-controlled)",
 )
 
@@ -599,6 +596,20 @@ def adapt_pstack_config(skill_name: str, body: str, models_file: str) -> str:
             "`inherit-parent`, omit the subagent model parameter.\n\n"
             + body
         )
+    if skill_name == "poteto-help":
+        body = body.replace("model rule is missing", "model configuration file is missing")
+        body = replace_required(
+            body,
+            "writes a rule. The rule applies to new chats.",
+            f"writes `{models_file}`. Each Skill that uses it reads it when invoked.",
+            skill_name,
+        )
+        return replace_required(
+            body,
+            "The rule from `/setup-pstack` applies to new chats. Start one.",
+            f"Check the role in `{models_file}` and rerun the Skill that uses it.",
+            skill_name,
+        )
     if skill_name != "setup-pstack":
         return body
 
@@ -625,6 +636,18 @@ def adapt_pstack_config(skill_name: str, body: str, models_file: str) -> str:
         "use `inherit-parent`. Never write an unverified real identifier. The aliases "
         "`inherit-parent` and `auto` mean to omit the subagent model parameter.",
     )
+    load_heading = "### 2. Load current state\n\n"
+    budget_heading = "### 3. Budget, map, and confirm"
+    load_start = body.index(load_heading) + len(load_heading)
+    budget_heading_start = body.index(budget_heading, load_start)
+    body = (
+        body[:load_start]
+        + f"If `{models_file}` exists, read its budget and role values. Keep choices for roles "
+        "listed in step 5, including `inherit-parent` and `auto`. Flag any model identifier "
+        "that the current host does not accept for review in step 3. Drop retired roles and "
+        "report them. Use the step 5 defaults for new or unset roles.\n\n"
+        + body[budget_heading_start:]
+    )
     budget_start = body.find("**(b) Apply it.**")
     budget_end = body.find("**(c) Show the roles and confirm.**")
     if budget_start == -1 or budget_end == -1 or budget_end < budget_start:
@@ -641,12 +664,13 @@ def adapt_pstack_config(skill_name: str, body: str, models_file: str) -> str:
         + body[budget_end:]
     )
     swap(
-        f"Write `{models_file}` with `alwaysApply: true`, a `# budget` line with the chosen "
-        "label and its target effort, and one line per role, using the same labels poteto-mode "
+        f"Write `{models_file}` with `alwaysApply: true`, the `# defaults: 3` line, a `# budget` "
+        "line with the chosen label and the effort that label names, and one line per role, "
+        "using the same labels poteto-mode "
         "uses. Overwrite the whole file so re-runs stay idempotent. Shape:",
-        f"Write `{models_file}` as plain Markdown with a `# budget` comment and one line per "
-        "role. This file is not host configuration; converted pstack consumers read it "
-        "explicitly. Overwrite the whole file so re-runs stay idempotent. Use only exact "
+        f"Write `{models_file}` as plain Markdown with the `# defaults: 3` and `# budget` "
+        "comments and one line per role. Converted pstack consumers read this file explicitly. "
+        "Overwrite the whole file so re-runs stay idempotent. Use only exact "
         "identifiers accepted by the current host. Shape:",
     )
     body = safe_pstack_shape(body, skill_name)
@@ -767,6 +791,14 @@ def adapt_body(skill: SourceSkill, target: str) -> str:
         "the current conversation."
     )
     body = body.replace(cursor_transcript_location, portable_transcript_location)
+    if skill.plugin_name == PSTACK_PLUGIN and skill.name == "reflect":
+        body = replace_required(
+            body,
+            "Read the whole transcript.",
+            "Read only the current session's transcript when the host exposes it. "
+            "If it is unavailable, use the current conversation.",
+            skill.name,
+        )
     body = body.replace(
         "The parent finds its own transcript file before fanning out. The system prompt names "
         "the active workspace's `agent-transcripts/` directory. Use that path. Do not glob "
@@ -982,6 +1014,15 @@ def copy_support_files(skill: SourceSkill, destination: Path, target: str) -> No
 
     shutil.copy2(skill.license_file, destination / "LICENSE")
     adapt_copied_resources(destination, target)
+    worker = destination / "worker.md"
+    if skill.plugin_name == PSTACK_PLUGIN and skill.name == "poteto-mode" and worker.is_file():
+        instructions = worker.read_text(encoding="utf-8")
+        worker.write_text(
+            "Apply these instructions within the active host's permissions and the operator's "
+            "authorized scope. Follow host confirmation requirements and open a PR only when "
+            "authorized.\n\n" + instructions,
+            encoding="utf-8",
+        )
     if uses_pstack_codex_adapter(skill, target):
         adapter = destination / PSTACK_CODEX_ADAPTER_REFERENCE
         adapter.parent.mkdir(parents=True, exist_ok=True)

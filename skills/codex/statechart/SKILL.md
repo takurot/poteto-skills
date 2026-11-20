@@ -4,7 +4,7 @@ description: "Check a TLA+ model of a system that moves between states, such as 
 license: MIT
 ---
 
-> Codex compatibility: converted from Cursor plugin `pstack` v0.15.36.
+> Codex compatibility: converted from Cursor plugin `pstack` v0.15.46.
 > Use the host's equivalent tool or subagent interface when the text names a Cursor-specific control.
 > Never claim that an unavailable hook, MCP server, named agent, or Cursor service ran.
 > Read `references/codex-adapter.md` in this Skill folder once per session. It maps Cursor tools, subagent fields, models, paths, and Cursor-only features to Codex.
@@ -21,7 +21,7 @@ Work in a scratch folder outside the repo. Write a TLA+ spec and its config. The
 <skill dir>/scripts/statechart SPEC.tla [--config FILE] [--view FILE] [--out DIR]
 ```
 
-`scripts/statechart.ts` is TypeScript, so run it with a runtime that can execute TypeScript.
+`scripts/statechart.ts` is TypeScript, so run it with a runtime that can execute TypeScript. `scripts/statechart` is a POSIX shell script that picks one. On native Windows, run `node --disable-warning=ExperimentalWarning <skill dir>/scripts/statechart.ts` with Node 22.18 to 22.x, or Node 23.6 or later.
 
 The first run installs TLC and Java with mise and needs the network.
 
