@@ -2,7 +2,7 @@
 
 [日本語](README_JP.md)
 
-**Last updated:** 2026-11-14
+**Last updated:** 2026-11-20
 
 A distribution of Skills from the official [`cursor/plugins`](https://github.com/cursor/plugins) collection, converted into formats that Claude Code and Codex can load.
 
@@ -16,6 +16,8 @@ A distribution of Skills from the official [`cursor/plugins`](https://github.com
 - `skills/manifest.json` — Manifest recording source paths, licenses, versions, compatibility notes, and generated-file checksums
 
 Only Skills declared by each Cursor plugin's `plugin.json` are converted. Plugins that contain only MCP configuration are not converted because they are not Skills. Two duplicate Skill pairs are consolidated by selecting either the more self-contained copy or the copy from the canonical plugin. The current source revision generates 110 Skills for each host.
+
+Both distributions include pstack 0.15.46. See the [pinned upstream source](https://github.com/cursor/plugins/tree/fbb86c09bbb4a25e490aaed136899ced1e9140e4/pstack).
 
 ## Installation
 

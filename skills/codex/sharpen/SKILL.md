@@ -4,7 +4,7 @@ description: "Make a task deeper, not bigger, then rewrite the prompt. Use for /
 license: MIT
 ---
 
-> Codex compatibility: converted from Cursor plugin `pstack` v0.15.36.
+> Codex compatibility: converted from Cursor plugin `pstack` v0.15.46.
 > Use the host's equivalent tool or subagent interface when the text names a Cursor-specific control.
 > Never claim that an unavailable hook, MCP server, named agent, or Cursor service ran.
 > Read `references/codex-adapter.md` in this Skill folder once per session. It maps Cursor tools, subagent fields, models, paths, and Cursor-only features to Codex.
@@ -18,4 +18,4 @@ I want a deeper version of this task, not a bigger one. Before rewriting it, do 
 
 Then rewrite my prompt to ask for exactly that.
 
-Leave choices that are mine to make open instead of deciding them.
+Have the rewritten prompt ask the agent to prototype any choice an experiment can settle and recommend an option based on what it observed. Leave product or preference choices that no experiment can settle for me to make.

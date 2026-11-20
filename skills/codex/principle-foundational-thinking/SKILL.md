@@ -4,23 +4,15 @@ description: "Apply before writing logic: choosing core types and data structure
 license: MIT
 ---
 
-> Codex compatibility: converted from Cursor plugin `pstack` v0.15.36.
+> Codex compatibility: converted from Cursor plugin `pstack` v0.15.46.
 > Use the host's equivalent tool or subagent interface when the text names a Cursor-specific control.
 > Never claim that an unavailable hook, MCP server, named agent, or Cursor service ran.
 > Read `references/codex-adapter.md` in this Skill folder once per session. It maps Cursor tools, subagent fields, models, paths, and Cursor-only features to Codex.
 
 # Foundational Thinking
 
-**Structural decisions** protect option value. **Code-level decisions** protect simplicity.
+Get the data shape right before writing logic. Define core types early, trace every access pattern, and choose structures that match the dominant paths. DRY the structure, not every line.
 
-**Data structures first.** Get the data shape right before writing logic. Define core types early, trace every access pattern, and choose structures that match the dominant paths.
+Before sharing state between actors, ask what happens if another actor modifies it concurrently. If the answer is not "nothing", isolate.
 
-At code level, DRY the structure, not every line. Types and data models should converge. Three similar statements still beat a premature abstraction. Prefer explicit over clever. Test behavior and edge cases, not line counts.
-
-**Concurrency corollary.** Before sharing state between actors, ask "what happens if another actor modifies this concurrently?" If not "nothing", isolate.
-
-**Scaffold first.** If something helps every later phase, do it first. Ask "does every subsequent phase benefit from this existing?" CI, linting, test infrastructure, and shared types are scaffold. Sequence for option value: setup before features, tests before fixes. Keep commits small and single-purpose.
-
-Each increment should land a coherent abstraction or deepen one that exists. Do not spread a new capability across callers as special-case coordination.
-
-Subtraction comes before scaffolding. Remove dead code first, then lay foundations.
+Scaffold first. Whatever helps every later phase (CI, tests, shared types) goes first, after removing dead code. Keep commits small and single-purpose.
